@@ -569,6 +569,8 @@ public class JPanelDemo extends JFrame {
             pdfDecoder.invalidate();
             scaling.setText(Integer.toString(newScale));
         repaint();
+        display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 	}
 	
 	public void zoomOut(float zoomF){
@@ -580,6 +582,8 @@ public class JPanelDemo extends JFrame {
 	            pdfDecoder.invalidate();
 	            scaling.setText(Integer.toString(newScale));
 	        repaint();
+	        display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 	}
 	
 
@@ -590,6 +594,8 @@ public class JPanelDemo extends JFrame {
 				pdfDecoder.decodePage(currentPage);
 				pdfDecoder.invalidate();
 				repaint();
+				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			} catch (Exception e1) {
 				System.err.println("forward 1 page");
 				e1.printStackTrace();
@@ -607,6 +613,8 @@ public class JPanelDemo extends JFrame {
 				pdfDecoder.decodePage(currentPage);
 				pdfDecoder.invalidate();
 				repaint();
+				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			} catch (Exception e1) {
 				System.err.println("back 1 page");
 				e1.printStackTrace();
@@ -625,6 +633,8 @@ public class JPanelDemo extends JFrame {
 				pdfDecoder.decodePage(currentPage);
 				pdfDecoder.invalidate();
 				repaint();
+				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			} catch (Exception e1) {
 				System.err.println("back to page 1");
 				e1.printStackTrace();
@@ -643,6 +653,8 @@ public class JPanelDemo extends JFrame {
 				pdfDecoder.decodePage(currentPage);
 				pdfDecoder.invalidate();
 				repaint();
+				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			} catch (Exception e1) {
 				System.err.println("back 10 pages");
 				e1.printStackTrace();
@@ -660,6 +672,8 @@ public class JPanelDemo extends JFrame {
 				pdfDecoder.decodePage(currentPage);
 				pdfDecoder.invalidate();
 				repaint();
+				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			} catch (Exception e1) {
 				System.err.println("forward 10 pages");
 				e1.printStackTrace();
@@ -677,6 +691,8 @@ public class JPanelDemo extends JFrame {
 				pdfDecoder.decodePage(currentPage);
 				pdfDecoder.invalidate();
 				repaint();
+				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			} catch (Exception e1) {
 				System.err.println("forward to last page");
 				e1.printStackTrace();
@@ -756,7 +772,6 @@ public class JPanelDemo extends JFrame {
 		} else {
 			JP = new JPanelDemo();
 		}
-		
 		LeapInput leap = new LeapInput();
         leap.start();
         leap.addEventListener(JP.new LeapMotion());
