@@ -30,6 +30,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.EventObject;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,9 +43,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import leap.LeapEvent;
+import leap.LeapEventListener;
+import leap.LeapInput;
+
 import org.jpedal.PdfDecoder;
-import org.jpedal.exception.PdfException;
 import org.jpedal.examples.viewer.utils.FileFilterer;
+import org.jpedal.exception.PdfException;
 import org.jpedal.fonts.FontMappings;
 
 /**
@@ -667,11 +672,17 @@ public class JPanelDemo extends JFrame {
 
 	}
 
-	public class LeapMotion implements ActionListener {
+	public class LeapMotion implements LeapEventListener {
+	    
+	    public LeapMotion(){
+	        
+	    }
 
-		public void actionPerformed(ActionEvent e) {
-
-			String command = e.getActionCommand();
+	    public void handleLeapEvent(LeapEvent e) {
+            
+	        System.out.println("getEvent");
+	        
+			String command = e.message;
 			String[] coordinate = command.split(",");
 
 			// forward 1 page
@@ -716,6 +727,7 @@ public class JPanelDemo extends JFrame {
             }
 			        
 		}
+
 	}
 
 	/** create a standalone program. User may pass in name of file as option */
@@ -727,5 +739,9 @@ public class JPanelDemo extends JFrame {
 		} else {
 			JP = new JPanelDemo();
 		}
+		
+		LeapInput leap = new LeapInput();
+        leap.start();
+        leap.addEventListener(JP.new LeapMotion());
 	}
 }
