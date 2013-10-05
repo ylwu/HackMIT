@@ -550,7 +550,7 @@ public class JPanelDemo extends JFrame {
         repaint();
 	}
 	
-	public void zoonOut(float zoomF){
+	public void zoomOut(float zoomF){
 	        pdfDecoder.setDisplayView(1,1);
 	            currentScale = Integer.parseInt(scaling.getText().trim());
 	            int newScale = (int)(currentScale / zoomF);
@@ -706,6 +706,15 @@ public class JPanelDemo extends JFrame {
 					&& Integer.parseInt(coordinate[0]) > 100) {
 				getLastPage();
 			}
+			
+			if (coordinate[0] == "zoomIn"){
+			    zoomIn(Integer.parseInt(coordinate[1]));
+			}
+			
+			if (coordinate[0] == "zoomOut"){
+                zoomOut(Integer.parseInt(coordinate[1]));
+            }
+			        
 		}
 	}
 
