@@ -26,12 +26,15 @@ public class LeapInput {
     Frame frame;
     Frame lastFrame;
     LeapListener listener;
-    long interval = 500;
+    long interval = 200;
     long maxSwipeCooldown = 1000;
     long swipeCooldown;
+    boolean decreaseQueue = false;
     int[] gesCount;
     LinkedList<Vector> lastHands;
-    LinkedList<Vector> lastIndexFingers;
+    LinkedList<Vector> lastFingerA;
+    LinkedList<Vector> lastFingerB;
+    LinkedList<Float> fingerDis;
     
     int tempCount;
     
@@ -58,7 +61,9 @@ public class LeapInput {
         lastFrame = frame;
         gesCount = new int[4];
         lastHands = new LinkedList<Vector>();
-        lastIndexFingers = new LinkedList<Vector>();
+        lastFingerA = new LinkedList<Vector>();
+        lastFingerB = new LinkedList<Vector>();
+        fingerDis = new LinkedList<Float>();
         swipeCooldown = 0;
         tempCount = 0;
     }
@@ -70,14 +75,16 @@ public class LeapInput {
 
             // Check if the hand has any fingers
             FingerList fingers = hand.fingers();
-            if (!fingers.empty()) {
+            if (fingers.count()>1) {
                 // Calculate the hand's average finger tip position
                 Vector avgPos = Vector.zero();
                 for (Finger finger : fingers) {
                     avgPos = avgPos.plus(finger.tipPosition());
                 }
-                Finger indexFinger = fingers.frontmost();
-                Vector indexPos = indexFinger.tipPosition();
+                Finger fingerA = fingers.get(0);
+                Finger fingerB = fingers.get(1);
+                Vector fingerAPos = fingerA.tipPosition();
+                Vector fingerBPos = fingerB.tipPosition();
                 avgPos = avgPos.divide(fingers.count());
                 System.out.println("Hand has " + fingers.count()
                                  + " fingers, average finger tip position: " + avgPos);
@@ -87,13 +94,21 @@ public class LeapInput {
                 lastHands.add(avgPos);
                 checkHand();
                 
-                if (lastIndexFingers.size()>10){
-                    lastIndexFingers.remove();
-                }
-                lastIndexFingers.add(indexPos);
-                
-                if (fingers.count()==2||fingers.count()==3){
-                    checkZoomer(fingers);
+                if (fingers.count()==2){
+                    if (lastFingerA.size()>10){
+                        lastFingerA.remove();
+                    }
+                    lastFingerA.add(fingerAPos);
+                    
+                    if (lastFingerB.size()>10){
+                        lastFingerB.remove();
+                    }
+                    lastFingerB.add(fingerBPos);
+                    float finDiff = fingerAPos.distanceTo(fingerBPos);
+                    if (fingerDis.size()>10){
+                        fingerDis.add(finDiff);
+                    }
+                    checkZoomer();
                 }
             }
 
@@ -119,15 +134,19 @@ public class LeapInput {
         //GestureList gestures = frame.gestures();
         int numGestures = gestures.count();
         List<Gesture> gesList = new ArrayList<Gesture>();
-        System.out.println(Integer.toString(numGestures));
-        if (numGestures>3 && swipeCooldown<=0){
-            for (int i=0;i<numGestures;i++){
-                if (gestures.get(i).type()==Gesture.Type.TYPE_SWIPE){
-                    gesList.add(gestures.get(i));
+        //System.out.println(Integer.toString(numGestures));
+        if (!frame.hands().isEmpty()){
+            if (frame.hands().get(0).fingers().count()>2 &&
+                numGestures>0 &&
+                swipeCooldown<=0){
+                for (int i=0;i<numGestures;i++){
+                    if (gestures.get(i).type()==Gesture.Type.TYPE_SWIPE){
+                        gesList.add(gestures.get(i));
+                    }
                 }
+                processSwipe(gesList);
+                swipeCooldown = maxSwipeCooldown;
             }
-            processSwipe(gesList);
-            swipeCooldown = maxSwipeCooldown;
         }
 //        for (int i=0; i<numGestures;i++){
 //            if (gestures.get(i).type()==Gesture.Type.TYPE_SCREEN_TAP){
@@ -165,7 +184,7 @@ public class LeapInput {
         //System.out.println(totEnd.toString());
         Vector result = (totEnd.minus(totStart)).divide(vSize);
         fireEvent("swipe,"+Float.toString(result.getX())+","+Float.toString(result.getY()));
-        //System.out.println(result.toString());
+        System.out.println(result.toString());
     }
     
     public void updatePointer(){
@@ -178,8 +197,12 @@ public class LeapInput {
         
     }
     
-    public void checkZoomer(FingerList fingers){
-        
+    public void checkZoomer(){
+        if (lastFingerA.size()==0 || lastFingerB.size()==0 
+                || fingerDis.size()==0){
+            return;
+        }
+        float current;
     }
     
     public void onScreenTap(ScreenTapGesture tap){
@@ -213,6 +236,15 @@ public class LeapInput {
         if (swipeCooldown>0){
             swipeCooldown-=interval;
         }
+        if (decreaseQueue){
+            if (lastFingerA.size()>0){
+                lastFingerA.remove();
+            }
+            if (lastFingerB.size()>0){
+                lastFingerB.remove();
+            }
+        }
+        decreaseQueue = !decreaseQueue;
     }
     
     public void start(){
@@ -224,12 +256,6 @@ public class LeapInput {
                 //System.out.println(tempCount);
             }
         }, interval, interval);
-//        try {
-//            update();
-//            System.in.read();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
  
     private List _listeners = new ArrayList();
