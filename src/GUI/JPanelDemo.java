@@ -683,47 +683,48 @@ public class JPanelDemo extends JFrame {
 	        System.out.println("getEvent");
 	        
 			String command = e.message;
+			System.out.println(command);
 			String[] coordinate = command.split(",");
 
 			// forward 1 page
-			if (coordinate[0] == "swipe"
-					&& Integer.parseInt(coordinate[1]) > 100) {
+			if (coordinate[0] .equals("swipe")
+					&& Float.parseFloat(coordinate[1]) > 100) {
 				forwardPage();
 			}
 			// back 1 page
-			if (coordinate[0] == "swipe"
-					&& Integer.parseInt(coordinate[1]) < -100) {
+			if (coordinate[0].equals("swipe")
+					&& Float.parseFloat(coordinate[1]) < -100) {
 				backPage();
 			}
 			// back to first page
-			if (coordinate[0] == "jump"
-					&& Integer.parseInt(coordinate[0]) < -100) {
+			if (coordinate[0].equals("jump")
+					&& Float.parseFloat(coordinate[0]) < -100) {
 				getFirstPage();
 			}
 			// fast backward 10 pages
-			if (coordinate[0] == "fast"
-					&& Integer.parseInt(coordinate[0]) < -100) {
+			if (coordinate[0].equals("fast")
+					&& Float.parseFloat(coordinate[0]) < -100) {
 				fastbackward();
 
 			}
 			// fast forward 10 pages
-			if (coordinate[0] == "fast"
-					&& Integer.parseInt(coordinate[0]) > 100) {
+			if (coordinate[0].equals("fast")
+					&& Float.parseFloat(coordinate[0]) > 100) {
 				fastforward();
 
 			}
 			// fast forward to last page
-			if (coordinate[0] == "jump"
-					&& Integer.parseInt(coordinate[0]) > 100) {
+			if (coordinate[0].equals("jump")
+					&& Float.parseFloat(coordinate[0]) > 100) {
 				getLastPage();
 			}
 			
-			if (coordinate[0] == "zoomIn"){
-			    zoomIn(Integer.parseInt(coordinate[1]));
+			if (coordinate[0].equals("zoomIn")){
+			    zoomIn(Float.parseFloat(coordinate[1]));
 			}
 			
-			if (coordinate[0] == "zoomOut"){
-                zoomOut(Integer.parseInt(coordinate[1]));
+			if (coordinate[0].equals("zoomOut")){
+                zoomOut(Float.parseFloat(coordinate[1]));
             }
 			        
 		}
