@@ -1,0 +1,546 @@
+package org.jpedal.android.App;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
+import android.util.Log;
+import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.*;
+import org.jpedal.android.App.R;
+import org.jpedal.android.App.CustomWebView;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class MainActivity extends Activity {
+
+	private ArrayList<String> pages;
+	private int currentPage = 1;
+	public static final String FOLDER = "";
+	// Variables used by navigation bar
+	private ImageButton pressedButton = null;
+	private MotionEvent.PointerCoords pointerCoords = new MotionEvent.PointerCoords();
+
+	/**
+	 * Called when the activity is first created.
+	 */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		getWindow().requestFeature(Window.FEATURE_NO_TITLE); // Stops the title from appearing on screen
+		setContentView(R.layout.main); // Sets the app to use the layout file main.xml located in res/layout/
+		
+		// Set up the various parts of the application
+		setupPages();
+		setupWebview();
+		setupScrollMenu();
+	}
+
+	/**
+	 * This adds the menu to the app.<br />
+	 * The menu itself is defined in the menu.xml file located in res/menu/
+	 *
+	 * @param menu
+	 * @return
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+
+	/**
+	 * This is run before showing the options menu. <br />
+	 * Currently all it does is disable the show/hide nav bar option if we are viewing a single page document
+	 *
+	 * @param menu
+	 * @return
+	 */
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		if (pages.size() <= 1) {
+			MenuItem hideNavOption = menu.findItem(R.id.hide_navbar);
+			hideNavOption.setVisible(false);
+			hideNavOption.setEnabled(false);
+		}
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	/**
+	 * Handles selecting menu items.
+	 *
+	 * @param item
+	 * @return
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+
+			// The hide navigation bar option
+			case R.id.hide_navbar:
+
+				// Get the nav bar view
+				HorizontalScrollView navBar = (HorizontalScrollView) findViewById(R.id.horizontalScrollView);
+
+				// Check if it is hidden (GONE)
+				if (navBar.getVisibility() == View.GONE) {
+					// Show if it is hidden
+					navBar.setVisibility(View.VISIBLE);
+					Animation aniUp = new TranslateAnimation(0.0f, 0.0f, navBar.getHeight(), 0.f);
+					aniUp.setDuration(600);
+					navBar.startAnimation(aniUp);
+					item.setTitle(getText(R.string.hide_nav));
+				} else {
+					// Hide if it is visible
+					// Setting to GONE instead of INVISIBLE effects the layout positioning of the views
+					Animation aniUp = new TranslateAnimation(0.0f, 0.0f, 0.f, navBar.getHeight());
+					aniUp.setDuration(600);
+					navBar.startAnimation(aniUp);
+					navBar.setVisibility(View.GONE);
+					item.setTitle(getText(R.string.show_nav));
+
+				}
+				return true;
+
+			// The about option
+			case R.id.aboutMenu:
+
+				// Create a text view to be shown in the alert box
+				final TextView message = new TextView(this);
+
+				// Get a SpannableString from res/values/strings.xml (This allows for easy changing of string values)
+				final SpannableString s = new SpannableString(getText(R.string.about_txt));
+				Linkify.addLinks(s, Linkify.ALL); // Make any links within the String work
+
+				// Set up the text view to use the SpannableString and work with links
+				message.setText(s);
+				message.setMovementMethod(LinkMovementMethod.getInstance());
+
+				// Build the Alert
+				AlertDialog.Builder B = new AlertDialog.Builder(this);
+				B.setNeutralButton(getText(R.string.close_button), null); // Add a close button that has no event handler
+				B.setView(message);
+				B.setTitle(getText(R.string.about_title));
+				// Create and show the Alert
+				B.create().show();
+				return true;
+
+			// Anything else
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
+	 * Set up the WebView <br />
+	 * That is the main browser window used to display the HTML output.
+	 */
+	private void setupWebview() {
+		// First get the WebView object from it's ID
+		CustomWebView webView = (CustomWebView) findViewById(R.id.webView);
+
+		// Set up the WebView's settings so it can use JavaScript and looks correct
+		WebSettings settings = webView.getSettings();
+		settings.setJavaScriptEnabled(true);
+		settings.setLoadWithOverviewMode(true);
+		settings.setUseWideViewPort(true);
+		settings.setBuiltInZoomControls(true);
+
+
+		// Load the first page of the File 
+		String indexUrl = FOLDER + "/" + pages.get(0); 
+		webView.loadUrl("file:///android_asset/html/" + indexUrl); 
+		webView.setupCustom(this);
+	}
+
+	/**
+	 * Sets up the pages ArrayList to contain a string representing each page in order. <br />
+	 * Pages named index.html are placed at the front of the list otherwise it is ordered by name.
+	 */
+	private void setupPages() {
+		// This is the directory the .html files are within and will be like this: assets/html/FOLDER
+
+		
+		String directory = "html/" + FOLDER;
+
+			
+			
+			
+		String[] files = null;
+		
+		try {
+			// This gives us an array of all the files contained within that directory
+			files = getResources().getAssets().list(directory);
+		} catch (IOException e) {
+			Log.d("jpedal", e.getMessage());
+		}
+
+
+		// Now we iterate through the list given to us and place them into an ordered ArrayList
+		pages = new ArrayList<String>();
+		for (String S : files) {
+			if (S.endsWith(".html")) {
+				if (S.equals("index.html")) {
+					pages.add(0, S);
+				} else {
+					pages.add(S);
+				}
+			}
+		}
+
+		// Finally update the buttons to make sure the next and previous buttons are disabled and enabled accordingly
+		updateButtons();
+	}
+
+	/**
+	 * This sets up the scrolling navigation bar at the bottom of the screen.
+	 */
+	private void setupScrollMenu() {
+
+		// First we get the directory of the page thumbnails
+		String directory = "html/" + FOLDER + "/thumbnails";
+			
+
+		// Next we get an array of each file within that FOLDER
+		String[] files = null;
+		try {
+			files = getResources().getAssets().list(directory);
+		} catch (IOException e) {
+			Log.d("jpedal", e.getMessage());
+		}
+
+
+		// If there is only one thumbnail or none at all we have a one page document so we hide the navigation bar
+		if (files.length <= 1) {
+			HorizontalScrollView navBar = (HorizontalScrollView) findViewById(R.id.horizontalScrollView);
+			navBar.setVisibility(View.GONE);
+
+			// exit from this method as we don't need to do anything else
+			return;
+		}
+
+		// Now we get the two rows contained within the navBar so we can add the thumbnails and text to them
+		TableRow thumbnailsRow = (TableRow) findViewById(R.id.thumbnailRow);
+		TableRow pageNumberRow = (TableRow) findViewById(R.id.pageNumberTow);
+
+		// Finally we loop through each file contained within the array and add the thumbnails and page number to the Nav Bar
+		for (String S : files) {
+			Log.d("jpedal", S); // print out the file name
+
+			// Make sure the file conforms to a number with optional leading 0's
+			// E.g. 01.png, 1.png, 020.png
+			Pattern P = Pattern.compile("-?\\d+");
+			Matcher M = P.matcher(S);
+			if (M.find()) {
+				// Get the integer number from the filename
+				int page = Integer.parseInt(M.group());
+
+				// Set up the InputStream to load the thumbnail and make an ImageButton object to add to the table
+				InputStream bitmap;
+				ImageButton btn = new ImageButton(getApplicationContext());
+				try {
+					// Load the thumbnail and decode it to a Bitmap object
+					bitmap = getAssets().open(directory + "/" + S);
+
+					Bitmap bit = BitmapFactory.decodeStream(bitmap);
+					// Then set the ImageButton to use that bitmap
+					btn.setImageBitmap(bit);
+
+					// Make sure to close the InputStream
+					if (bitmap != null) {
+						bitmap.close();
+					}
+
+					btn.setBackgroundDrawable(null); // make the background transparent
+					btn.setAdjustViewBounds(true); // preserves aspect ratio of image
+					// Set the max values of the ImageButton so they don't get stretched
+
+					// Fix for smaller devices
+//					Log.d("jpedal", "" +getWindowManager().getDefaultDisplay().getHeight());
+					if (getWindowManager().getDefaultDisplay().getHeight() < 500) {
+						btn.setMaxHeight(100);
+						btn.setMaxWidth(100);
+					} else {
+						btn.setMaxHeight(150);
+						btn.setMaxWidth(150);
+					}
+
+					btn.setScaleType(ImageView.ScaleType.CENTER_INSIDE); // Center it
+
+					// Add the on touch listener to the ImageButton
+					btn.setOnTouchListener(new scrollButtonOnTouchListener(page));
+
+					// Finally add the ImageButton to the table
+					thumbnailsRow.addView(btn);
+
+
+					// Create and add the page number below the ImageButton
+					TextView pageNum = new TextView(getApplicationContext());
+					pageNum.setText(getText(R.string.page) + " " + page);
+					pageNum.setGravity(Gravity.CENTER_HORIZONTAL);
+					pageNumberRow.addView(pageNum);
+				} catch (IOException e) {
+					Log.d("jpedal", e.getMessage());
+				}
+			}
+		}
+		// Runs the method to make sure the backgrounds of the image buttons are correct
+		removeScrollBackgrounds();
+
+	}
+
+	/**
+	 * Updates the page number text along with the next and previous page buttons. <br />
+	 * Disabling and enabling them appropriately.
+	 */
+	private void updateButtons() {
+		// Get the next and previous buttons and the page text
+		Button nextButton = (Button) findViewById(R.id.next);
+		Button prevButton = (Button) findViewById(R.id.prev);
+		TextView pageText = (TextView) findViewById(R.id.pageText);
+
+		// First page check
+		if (currentPage <= 1) {
+			prevButton.setEnabled(false);
+		} else {
+			prevButton.setEnabled(true);
+		}
+
+		// Last Page check
+		if (currentPage >= pages.size()) {
+			nextButton.setEnabled(false);
+		} else {
+			nextButton.setEnabled(true);
+		}
+
+		// Update the page number text
+
+		pageText.setText(getText(R.string.page) + " " + currentPage);
+	}
+
+	/**
+	 * Load the current page and update the buttons
+	 */
+	private void navigate() {
+		WebView webView = (WebView) findViewById(R.id.webView);
+		
+		webView.loadUrl("file:///android_asset/html/" + FOLDER + "/" + pages.get(currentPage - 1));
+
+		updateButtons();
+	}
+
+	/**
+	 * Attempts to navigate to the next page in the converted PDF. <br />
+	 * Calling the appropriate methods and updating the views accordingly.
+	 *
+	 * @param view
+	 */
+	public void nextPage(View view) {
+		// Make sure there is a next page
+		if (currentPage < pages.size()) {
+			currentPage++; // Increment what page number we are on
+			navigate(); // load the page
+			removeScrollBackgrounds(); // remove any scroll backgrounds on the nav bar
+			updateScrollMenu();
+		}
+	}
+
+	/**
+	 * Attempts to navigate to the previous page in the converted PDF. <br />
+	 * Calling the appropriate methods and updating the views accordingly.
+	 *
+	 * @param view
+	 */
+	public void prevPage(View view) {
+		// Make sure there is a previous page
+		if (currentPage > 1) {
+			currentPage--; // Decrement what page number we are on
+			navigate(); // load the page
+			removeScrollBackgrounds(); // remove any scroll backgrounds on the nav bar
+			updateScrollMenu();
+		}
+	}
+
+	/**
+	 * Call this to update the position on the bottom bar menu so that the current page is in view
+	 */
+	private void updateScrollMenu() {
+		// Call the scrollBarTo method to make sure the nav bar keeps the current page in view
+		HorizontalScrollView horizontalScrollView = (HorizontalScrollView) findViewById(R.id.horizontalScrollView);
+		TableLayout tl = (TableLayout) horizontalScrollView.getChildAt(0);
+		TableRow tr = (TableRow) tl.getChildAt(0);
+		scrollBarTo(tr.getChildAt(currentPage - 1));
+	}
+
+	/**
+	 * Removes the background colours of each thumbnail on the nav bar.
+	 * Except for the current page which is highlighted blue.
+	 */
+	private void removeScrollBackgrounds() {
+		TableRow ll = (TableRow) findViewById(R.id.thumbnailRow);
+		for (int i = 0; i < ll.getChildCount(); i++) {
+			View view = ll.getChildAt(i); // Get the view from the table row
+
+			// Check if it's the current page
+			if (i + 1 == currentPage) {
+				view.setBackgroundColor(Color.parseColor(getText(R.string.current_color).toString())); // Set the background to be the current page colour
+				continue;
+			}
+
+			// Set the background to be transparent
+			view.setBackgroundDrawable(null);
+		}
+	}
+
+	/**
+	 * Scrolls the navbar to the given view
+	 *
+	 * @param v The view to scroll to
+	 */
+	private void scrollBarTo(View v) {
+		HorizontalScrollView navBar = (HorizontalScrollView) findViewById(R.id.horizontalScrollView);
+		navBar.scrollTo(v.getLeft(), 0); // Scroll to place the view into view
+	}
+
+	/**
+	 * Get a list of pages in order
+	 *
+	 * @return
+	 */
+	public ArrayList<String> getPages() {
+		return pages;
+	}
+
+	/**
+	 * Returns the current page number
+	 *
+	 * @return current page number
+	 */
+	public int getCurrentPage() {
+		return currentPage;
+	}
+
+	/**
+	 * Sets the current page number and optionally navigates to it.
+	 * If navigate is false it just updates the display.
+	 *
+	 * @param currentPage the page number to set to
+	 * @param navigate    Whether to navigate the webview to the page or not
+	 */
+	public void setCurrentPage(int currentPage, boolean navigate) {
+		this.currentPage = currentPage;
+		if (navigate) {
+			navigate();
+		} else {
+			updateButtons();
+		}
+		updateScrollMenu();
+		removeScrollBackgrounds();
+	}
+
+	/**
+	 * This is the on touch listener for the nav bar buttons.
+	 */
+	private class scrollButtonOnTouchListener implements View.OnTouchListener {
+
+		// The page number this listener refers to
+		private int pageNumber = 0;
+
+		/**
+		 * Needs to be given a page number to work.
+		 *
+		 * @param pageNumber The page number
+		 */
+		public scrollButtonOnTouchListener(int pageNumber) {
+			this.pageNumber = pageNumber;
+		}
+
+		/**
+		 * This is the main event we are concerned with.<br />
+		 * Each touch event that happens to the button passes through this method.
+		 *
+		 * @param view        The view being touched, in our case the ImageButton
+		 * @param motionEvent The motion event happening
+		 * @return
+		 */
+		@Override
+		public boolean onTouch(View view, MotionEvent motionEvent) {
+
+			switch (motionEvent.getAction()) {
+
+				// Being pressed
+				case MotionEvent.ACTION_DOWN:
+					// On a press down the colour is changed to the highlight colour
+					view.setBackgroundColor(Color.parseColor(getText(R.string.highlight_color).toString()));
+					pressedButton = (ImageButton) view; // set a global variable for later use
+					break;
+
+				// Canceled action, not sure when this is called but it does happen
+				case MotionEvent.ACTION_CANCEL:
+					// Get rid of the backgrounds
+					removeScrollBackgrounds();
+					break;
+
+				// Released
+				case MotionEvent.ACTION_UP:
+					// Check to see if we released our finger on the same button we pressed down on
+					if (pressedButton == view) {
+						// If so we navigate to that page and reset the background colours accordingly
+						currentPage = pageNumber;
+						removeScrollBackgrounds();
+						navigate();
+						scrollBarTo(view);
+					}
+					pressedButton = null; // we are no longer pressing a button
+					break;
+
+				// Moved finger
+				case MotionEvent.ACTION_MOVE:
+
+					// Check to see if we have a previous record of where the finger was
+					if (pointerCoords != null) {
+						// If we do we compare it to where we are now
+						MotionEvent.PointerCoords P = new MotionEvent.PointerCoords();
+						motionEvent.getPointerCoords(0, P); // get coords for first touch
+
+						final int allowance = 100; // The allowance before we remove the backgrounds from what we selected
+						if (P.x > pointerCoords.x + allowance || P.x < pointerCoords.x - allowance) {
+							pointerCoords = P;
+
+							removeScrollBackgrounds();
+						}
+					} else {
+						// If we don't have a record of where we last saw a touch we shall need one
+						motionEvent.getPointerCoords(0, pointerCoords);
+					}
+
+					break;
+
+				default:
+					Log.d("jpedal", motionEvent.getAction() + " unknown motion event");
+					break;
+			}
+			return true;
+		}
+
+
+	}
+
+}

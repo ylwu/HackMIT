@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Jpedal PDF App</string>
+    <string name="page">Page</string>
+    <string name="show_nav">Show Navigation Bar</string>
+    <string name="hide_nav">Hide Navigation Bar</string>
+
+
+    <string name="close_button">Close</string>
+
+    <string name="help_swipe">Swipe left and right to navigate</string>
+
+    <string name="highlight_color">#FF0000</string>
+    <string name="current_color">#0000FF</string>
+
+    <string name="about_title">About</string>
+    <string name="about_txt">The original source code for this application was created by IDR Solutions.
+        http://idrsolutions.com/
+    </string>
+</resources>
