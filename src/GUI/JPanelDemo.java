@@ -535,6 +535,29 @@ public class JPanelDemo extends JFrame {
 		
 		return list;
 	}
+	
+	public void zoomIn(float zoomF){
+	    pdfDecoder.setDisplayView(1,1);
+            currentScale = Integer.parseInt(scaling.getText().trim());
+            int newScale = (int)(currentScale * zoomF);
+            float factor = (float) ((double)newScale/100);
+            pdfDecoder.setPageParameters(factor, currentPage);
+            pdfDecoder.invalidate();
+            scaling.setText(Integer.toString(newScale));
+        repaint();
+	}
+	
+	public void zoonOut(float zoomF){
+	        pdfDecoder.setDisplayView(1,1);
+	            currentScale = Integer.parseInt(scaling.getText().trim());
+	            int newScale = (int)(currentScale / zoomF);
+	            float factor = (float) ((double)newScale/100);
+	            pdfDecoder.setPageParameters(factor, currentPage);
+	            pdfDecoder.invalidate();
+	            scaling.setText(Integer.toString(newScale));
+	        repaint();
+	}
+	
 	public void forwardPage(){
 		if(currentFile!=null && currentPage<pdfDecoder.getPageCount()){
 	        currentPage += 1;
