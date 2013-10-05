@@ -30,6 +30,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -46,6 +47,8 @@ import org.jpedal.PdfDecoder;
 import org.jpedal.exception.PdfException;
 import org.jpedal.examples.viewer.utils.FileFilterer;
 import org.jpedal.fonts.FontMappings;
+import org.jpedal.objects.PdfImageData;
+import org.jpedal.objects.PdfPageData;
 
 /**
  * very simple example of a viewer
@@ -68,7 +71,11 @@ public class JPanelDemo extends JFrame {
 	/** current page number (first page is 1) */
 	private int currentPage = 1;
 	private int currentScale = 100;
+	private PdfImageData[] pageImages;
+	private PdfPageData[] pageTexts;
 	
+	private Container cPane;
+	private JScrollPane display;
 	private final JLabel pageCounter1 = new JLabel("Page ");
 	private JTextField pageCounter2 = new JTextField(4);// 000 used to set // prefered size
 	private final JLabel pageCounter3 = new JLabel("of");// 000 used to set prefered // size
@@ -83,22 +90,9 @@ public class JPanelDemo extends JFrame {
 		// ensure non-embedded font map to sensible replacements
 		FontMappings.setFontReplacements();
 		currentFile = name;// store file name for use in page changer
-		try {
-			// this opens the PDF and reads its internal details
-			pdfDecoder.openPdfFile(currentFile);
-			// these 2 lines opens page 1 at 100% scaling
-			pdfDecoder.decodePage(currentPage);
-			pdfDecoder.setPageParameters(1, 1); // values scaling (1=100%). page
-												// number
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		// setup our GUI display
 		initializeViewer();
 		// set page number display
-		pageCounter2.setText(String.valueOf(currentPage));
-		pageCounter3.setText("of " + pdfDecoder.getPageCount());
-		scaling.setText(String.valueOf(currentScale));
 	}
 
 	/**
@@ -116,6 +110,8 @@ public class JPanelDemo extends JFrame {
 	 * opens a chooser and allows user to select a pdf file and opens it
 	 */
 	private void selectFile() {
+		pageImages = null;
+		pageTexts = null;
 		JFileChooser open = new JFileChooser(".");
 		open.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		String[] pdf = new String[] { "pdf" };
@@ -128,6 +124,7 @@ public class JPanelDemo extends JFrame {
 			if (resultOfFileSelect == JFileChooser.APPROVE_OPTION) {
 				currentFile = open.getSelectedFile().getAbsolutePath();
 				currentPage = 1;
+				int pageNumber = pdfDecoder.getPageCount();
 				try {
 					// close the current pdf before opening another
 					pdfDecoder.closePdfFile();
@@ -141,7 +138,15 @@ public class JPanelDemo extends JFrame {
 					}
 
 					// these 2 lines opens page 1 at 100% scaling
+/*					pageImages = new PdfImageData[pageNumber];
+					pageTexts = new PdfPageData[pageNumber];
+					for (int i=0; i<pageNumber; i++){
+						pdfDecoder.decodePage(i+1);
+						pageImages[i+1] = pdfDecoder.getPdfImageData();
+						pageTexts[i+1] = pdfDecoder.getPdfPageData();
+					}*/
 					pdfDecoder.decodePage(currentPage);
+					// these 2 lines opens page 1 at 100% scaling
 					pdfDecoder.setPageParameters(1, 1); // values scaling // (1=100%). page number
 					pdfDecoder.invalidate();
 				} catch (Exception e) {
@@ -150,7 +155,7 @@ public class JPanelDemo extends JFrame {
 				
 				// set page number display
 				pageCounter2.setText(String.valueOf(currentPage));
-				pageCounter3.setText("of " + pdfDecoder.getPageCount());
+				pageCounter3.setText("of " + pageNumber);
 				setTitle(viewerTitle + " - " + currentFile);
 				scaling.setText(String.valueOf(currentScale));
 				repaint();
@@ -201,7 +206,7 @@ public class JPanelDemo extends JFrame {
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-		Container cPane = getContentPane();
+		cPane = getContentPane();
 		cPane.setLayout(new BorderLayout());
 
 		JButton open = initOpenBut();// setup open button
@@ -209,7 +214,7 @@ public class JPanelDemo extends JFrame {
 													// changer
 
 		JPanel topBar = new JPanel();
-		topBar.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		topBar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		topBar.add(open);
 		// topBar.add(pageChanger);
 		for (Component anItemsToAdd : itemsToAdd) {
@@ -217,18 +222,14 @@ public class JPanelDemo extends JFrame {
 		}
 
 		cPane.add(topBar, BorderLayout.NORTH);
-
-		JScrollPane display = initPDFDisplay();// setup scrollpane with pdf
-												// display inside
+		// setup scrollpane with pdf							
+		initPDFDisplay();
+		// display inside
 		cPane.add(display, BorderLayout.CENTER);
-
 		pack();
-
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		setSize(screen.width / 2, screen.height / 2);
-
+		setSize(screen.width/2, screen.height/2);
 		setLocationRelativeTo(null);// centre on screen
-
 		setVisible(true);
 	}
 
@@ -256,16 +257,13 @@ public class JPanelDemo extends JFrame {
 	/**
 	 * returns the scrollpane with pdfDecoder set as the viewport
 	 */
-	private JScrollPane initPDFDisplay() {
-
-		JScrollPane currentScroll = new JScrollPane();
-		currentScroll
+	private void initPDFDisplay() {
+		display = new JScrollPane();
+		display
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		currentScroll
+		display
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		currentScroll.setViewportView(pdfDecoder);
-
-		return currentScroll;
+		display.setViewportView(pdfDecoder);
 	}
 
 	/**
@@ -294,6 +292,8 @@ public class JPanelDemo extends JFrame {
 						pdfDecoder.decodePage(currentPage);
 						pdfDecoder.invalidate();
 						repaint();
+						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 					} catch (Exception e1) {
 						System.err.println("back to page 1");
 						e1.printStackTrace();
@@ -323,6 +323,8 @@ public class JPanelDemo extends JFrame {
 						pdfDecoder.decodePage(currentPage);
 						pdfDecoder.invalidate();
 						repaint();
+						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 					} catch (Exception e1) {
 						System.err.println("back 10 pages");
 						e1.printStackTrace();
@@ -352,6 +354,8 @@ public class JPanelDemo extends JFrame {
 						pdfDecoder.decodePage(currentPage);
 						pdfDecoder.invalidate();
 						repaint();
+						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 					} catch (Exception e1) {
 						System.err.println("back 1 page");
 						e1.printStackTrace();
@@ -383,6 +387,8 @@ public class JPanelDemo extends JFrame {
 						pdfDecoder.decodePage(currentPage);
 						pdfDecoder.invalidate();
 						repaint();
+						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 					} catch (Exception e) {
 						System.err.println("page number entered");
 						e.printStackTrace();
@@ -433,6 +439,8 @@ public class JPanelDemo extends JFrame {
 						pdfDecoder.decodePage(currentPage);
 						pdfDecoder.invalidate();
 						repaint();
+						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 					} catch (Exception e1) {
 						System.err.println("forward 1 page");
 						e1.printStackTrace();
@@ -463,6 +471,8 @@ public class JPanelDemo extends JFrame {
 						pdfDecoder.decodePage(currentPage);
 						pdfDecoder.invalidate();
 						repaint();
+						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 					} catch (Exception e1) {
 						System.err.println("forward 10 pages");
 						e1.printStackTrace();
@@ -502,6 +512,8 @@ public class JPanelDemo extends JFrame {
 					// set page number display
 					pageCounter2.setText(String.valueOf(currentPage));
 					repaint();
+					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 				}
 			}
 		});
@@ -528,6 +540,8 @@ public class JPanelDemo extends JFrame {
 											+ " > is Not a valid Value.\nPlease enter an integer");
 				}
 				repaint();
+				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			}
 		});
 		
