@@ -26,7 +26,7 @@ public class LeapInput {
     Frame frame;
     Frame lastFrame;
     LeapListener listener;
-    long interval = 500;
+    long interval = 200;
     long maxSwipeCooldown = 1000;
     long swipeCooldown;
     boolean decreaseQueue = false;
