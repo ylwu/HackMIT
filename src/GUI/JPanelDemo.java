@@ -59,7 +59,7 @@ public class JPanelDemo extends JFrame {
   private String viewerTitle="Jpanel Demo";
   
   /**the actual JPanel/decoder object*/
-  private PdfDecoder pdfDecoder;
+  public PdfDecoder pdfDecoder;
   
   /**name of current PDF file*/
   private String currentFile=null;
@@ -78,7 +78,6 @@ public class JPanelDemo extends JFrame {
     
     pdfDecoder = new PdfDecoder(true);
 
-
         //ensure non-embedded font map to sensible replacements
         FontMappings.setFontReplacements();
 
@@ -91,6 +90,8 @@ public class JPanelDemo extends JFrame {
       
       //these 2 lines opens page 1 at 100% scaling
       pdfDecoder.decodePage(currentPage);
+     
+      
       pdfDecoder.setPageParameters(1,1); //values scaling (1=100%). page number
     }catch(Exception e){
       e.printStackTrace();
@@ -159,9 +160,9 @@ public class JPanelDemo extends JFrame {
           
 //          these 2 lines opens page 1 at 100% scaling
           pdfDecoder.decodePage(currentPage);
+          pdfDecoder.setDisplayView(5,5);
           pdfDecoder.setPageParameters(1,1); //values scaling (1=100%). page number
           pdfDecoder.invalidate();
-          
         }catch(Exception e){
           e.printStackTrace();
         }
@@ -506,12 +507,13 @@ public class JPanelDemo extends JFrame {
   /**create a standalone program. User may pass in name of file as option*/
   public static void main(String[] args) {
     
-    
+	  JPanelDemo JP;
         /** Run the software */
         if (args.length > 0) {
-            new JPanelDemo(args[0]);
+            JP = new JPanelDemo(args[0]);
         } else {
-            new JPanelDemo();
+        	JP = new JPanelDemo();
         }
+        System.out.println(JP.pdfDecoder.getDisplayView());
   }
 }
