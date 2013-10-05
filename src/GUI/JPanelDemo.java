@@ -68,10 +68,12 @@ public class JPanelDemo extends JFrame {
 	/** current page number (first page is 1) */
 	private int currentPage = 1;
 	private int currentScale = 100;
-	
+
 	private final JLabel pageCounter1 = new JLabel("Page ");
-	private JTextField pageCounter2 = new JTextField(4);// 000 used to set // prefered size
-	private final JLabel pageCounter3 = new JLabel("of");// 000 used to set prefered // size
+	private JTextField pageCounter2 = new JTextField(4);// 000 used to set //
+														// prefered size
+	private final JLabel pageCounter3 = new JLabel("of");// 000 used to set
+															// prefered // size
 	private JTextField scaling = new JTextField(4);
 	private final JLabel scaling2 = new JLabel("%");
 
@@ -142,12 +144,13 @@ public class JPanelDemo extends JFrame {
 
 					// these 2 lines opens page 1 at 100% scaling
 					pdfDecoder.decodePage(currentPage);
-					pdfDecoder.setPageParameters(1, 1); // values scaling // (1=100%). page number
+					pdfDecoder.setPageParameters(1, 1); // values scaling //
+														// (1=100%). page number
 					pdfDecoder.invalidate();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
+
 				// set page number display
 				pageCounter2.setText(String.valueOf(currentPage));
 				pageCounter3.setText("of " + pdfDecoder.getPageCount());
@@ -505,18 +508,18 @@ public class JPanelDemo extends JFrame {
 				}
 			}
 		});
-		
+
 		list[11] = new JPanel();
 		scaling.setEditable(true);
 		list[12] = scaling;
 		scaling.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent a) {
-				pdfDecoder.setDisplayView(1,1);
+				pdfDecoder.setDisplayView(1, 1);
 				String value = scaling.getText().trim();
 				try {
 					currentScale = Integer.parseInt(value);
-					float factor = (float) ((double)currentScale/100);
+					float factor = (float) ((double) currentScale / 100);
 					pdfDecoder.setPageParameters(factor, currentPage);
 					pdfDecoder.invalidate();
 				} catch (Exception e) {
@@ -530,89 +533,157 @@ public class JPanelDemo extends JFrame {
 				repaint();
 			}
 		});
-		
+
 		list[13] = scaling2;
-		
+
 		return list;
 	}
-	public void forwardPage(){
-		if(currentFile!=null && currentPage<pdfDecoder.getPageCount()){
-	        currentPage += 1;
-	        try {
-	          pdfDecoder.decodePage(currentPage);
-	          pdfDecoder.invalidate();
-	          repaint();
-	        } catch (Exception e1) {
-	          System.err.println("forward 1 page");
-	          e1.printStackTrace();
-	        }
-	        
-//	        set page number display
-	        pageCounter2.setText(String.valueOf(currentPage));
-	      }
+
+	public void forwardPage() {
+		if (currentFile != null && currentPage < pdfDecoder.getPageCount()) {
+			currentPage += 1;
+			try {
+				pdfDecoder.decodePage(currentPage);
+				pdfDecoder.invalidate();
+				repaint();
+			} catch (Exception e1) {
+				System.err.println("forward 1 page");
+				e1.printStackTrace();
+			}
+
+			// set page number display
+			pageCounter2.setText(String.valueOf(currentPage));
+		}
 	}
-	public void backPage(){
-		if(currentFile!=null && currentPage>1){
-	        currentPage -= 1;
-	          try {
-	          pdfDecoder.decodePage(currentPage);
-	          pdfDecoder.invalidate();
-	          repaint();
-	        } catch (Exception e1) {
-	          System.err.println("back 1 page");
-	          e1.printStackTrace();
-	        }
-		
-	          
-//	          set page number display
-	        pageCounter2.setText(String.valueOf(currentPage));
-	      }
-		
+
+	public void backPage() {
+		if (currentFile != null && currentPage > 1) {
+			currentPage -= 1;
+			try {
+				pdfDecoder.decodePage(currentPage);
+				pdfDecoder.invalidate();
+				repaint();
+			} catch (Exception e1) {
+				System.err.println("back 1 page");
+				e1.printStackTrace();
+			}
+
+			// set page number display
+			pageCounter2.setText(String.valueOf(currentPage));
+		}
+
 	}
-	public void returnFirstPage(){
-		if(currentFile!=null && currentPage!=1){
-	        currentPage = 1;
-	        try {
-	        pdfDecoder.decodePage(currentPage);
-	        pdfDecoder.invalidate();
-	        repaint();
-	      } catch (Exception e1) {
-	        System.err.println("back to page 1");
-	        e1.printStackTrace();
-	      }
-	        
-	        //set page number display
-	      pageCounter2.setText(String.valueOf(currentPage));
-	      }
-		
+
+	public void getFirstPage() {
+		if (currentFile != null && currentPage != 1) {
+			currentPage = 1;
+			try {
+				pdfDecoder.decodePage(currentPage);
+				pdfDecoder.invalidate();
+				repaint();
+			} catch (Exception e1) {
+				System.err.println("back to page 1");
+				e1.printStackTrace();
+			}
+
+			// set page number display
+			pageCounter2.setText(String.valueOf(currentPage));
+		}
+
 	}
+
+	public void fastbackward() {
+		if (currentFile != null && currentPage > 10) {
+			currentPage -= 10;
+			try {
+				pdfDecoder.decodePage(currentPage);
+				pdfDecoder.invalidate();
+				repaint();
+			} catch (Exception e1) {
+				System.err.println("back 10 pages");
+				e1.printStackTrace();
+			}
+
+			// set page number display
+			pageCounter2.setText(String.valueOf(currentPage));
+		}
+	}
+
+	public void fastforward() {
+		if (currentFile != null && currentPage < pdfDecoder.getPageCount() - 9) {
+			currentPage += 10;
+			try {
+				pdfDecoder.decodePage(currentPage);
+				pdfDecoder.invalidate();
+				repaint();
+			} catch (Exception e1) {
+				System.err.println("forward 10 pages");
+				e1.printStackTrace();
+			}
+
+			// set page number display
+			pageCounter2.setText(String.valueOf(currentPage));
+		}
+	}
+
+	public void getLastPage() {
+		if (currentFile != null && currentPage < pdfDecoder.getPageCount()) {
+			currentPage = pdfDecoder.getPageCount();
+			try {
+				pdfDecoder.decodePage(currentPage);
+				pdfDecoder.invalidate();
+				repaint();
+			} catch (Exception e1) {
+				System.err.println("forward to last page");
+				e1.printStackTrace();
+			}
+
+			// set page number display
+			pageCounter2.setText(String.valueOf(currentPage));
+		}
+
+	}
+
 	public class LeapMotion implements ActionListener {
 
-		public void actionPerformed(ActionEvent e){
-			
+		public void actionPerformed(ActionEvent e) {
+
 			String command = e.getActionCommand();
 			String[] coordinate = command.split(",");
-			
-			//forward 1 page
-			if (Integer.parseInt(coordinate[0])>100 && Integer.parseInt(coordinate[0])<=30 && Integer.parseInt(coordinate[0])>=-30){
-				forwardPage();				    
-				}
-			//back 1 page
-			if (Integer.parseInt(coordinate[0])>-100 && Integer.parseInt(coordinate[0])<=30 && Integer.parseInt(coordinate[0])>=-30){
-			 backPage();
+
+			// forward 1 page
+			if (coordinate[0] == "swipe"
+					&& Integer.parseInt(coordinate[1]) > 100) {
+				forwardPage();
 			}
-			//back to page 1
-			if (Integer.parseInt(coordinate[0])>-100 && Integer.parseInt(coordinate[0])<=30 && Integer.parseInt(coordinate[0])>=-30){
-				 returnFirstPage();
-				}
-			if (Integer.parseInt(coordinate[0])>100 && Integer.parseInt(coordinate[0])<=30 && Integer.parseInt(coordinate[0])>=-30){
-				
-			      
-			      }
-			
-			
-			
+			// back 1 page
+			if (coordinate[0] == "swipe"
+					&& Integer.parseInt(coordinate[1]) < -100) {
+				backPage();
 			}
+			// back to first page
+			if (coordinate[0] == "jump"
+					&& Integer.parseInt(coordinate[0]) < -100) {
+				getFirstPage();
+			}
+			// fast backward 10 pages
+			if (coordinate[0] == "fast"
+					&& Integer.parseInt(coordinate[0]) < -100) {
+				fastbackward();
+
+			}
+			// fast forward 10 pages
+			if (coordinate[0] == "fast"
+					&& Integer.parseInt(coordinate[0]) > 100) {
+				fastforward();
+
+			}
+			// fast forward to last page
+			if (coordinate[0] == "jump"
+					&& Integer.parseInt(coordinate[0]) > 100) {
+				getLastPage();
+			}
+		}
 	}
 
 	/** create a standalone program. User may pass in name of file as option */
