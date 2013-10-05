@@ -535,6 +535,85 @@ public class JPanelDemo extends JFrame {
 		
 		return list;
 	}
+	public void forwardPage(){
+		if(currentFile!=null && currentPage<pdfDecoder.getPageCount()){
+	        currentPage += 1;
+	        try {
+	          pdfDecoder.decodePage(currentPage);
+	          pdfDecoder.invalidate();
+	          repaint();
+	        } catch (Exception e1) {
+	          System.err.println("forward 1 page");
+	          e1.printStackTrace();
+	        }
+	        
+//	        set page number display
+	        pageCounter2.setText(String.valueOf(currentPage));
+	      }
+	}
+	public void backPage(){
+		if(currentFile!=null && currentPage>1){
+	        currentPage -= 1;
+	          try {
+	          pdfDecoder.decodePage(currentPage);
+	          pdfDecoder.invalidate();
+	          repaint();
+	        } catch (Exception e1) {
+	          System.err.println("back 1 page");
+	          e1.printStackTrace();
+	        }
+		
+	          
+//	          set page number display
+	        pageCounter2.setText(String.valueOf(currentPage));
+	      }
+		
+	}
+	public void returnFirstPage(){
+		if(currentFile!=null && currentPage!=1){
+	        currentPage = 1;
+	        try {
+	        pdfDecoder.decodePage(currentPage);
+	        pdfDecoder.invalidate();
+	        repaint();
+	      } catch (Exception e1) {
+	        System.err.println("back to page 1");
+	        e1.printStackTrace();
+	      }
+	        
+	        //set page number display
+	      pageCounter2.setText(String.valueOf(currentPage));
+	      }
+		
+	}
+	public class LeapMotion implements ActionListener {
+
+		public void actionPerformed(ActionEvent e){
+			
+			String command = e.getActionCommand();
+			String[] coordinate = command.split(",");
+			
+			//forward 1 page
+			if (Integer.parseInt(coordinate[0])>100 && Integer.parseInt(coordinate[0])<=30 && Integer.parseInt(coordinate[0])>=-30){
+				forwardPage();				    
+				}
+			//back 1 page
+			if (Integer.parseInt(coordinate[0])>-100 && Integer.parseInt(coordinate[0])<=30 && Integer.parseInt(coordinate[0])>=-30){
+			 backPage();
+			}
+			//back to page 1
+			if (Integer.parseInt(coordinate[0])>-100 && Integer.parseInt(coordinate[0])<=30 && Integer.parseInt(coordinate[0])>=-30){
+				 returnFirstPage();
+				}
+			if (Integer.parseInt(coordinate[0])>100 && Integer.parseInt(coordinate[0])<=30 && Integer.parseInt(coordinate[0])>=-30){
+				
+			      
+			      }
+			
+			
+			
+			}
+	}
 
 	/** create a standalone program. User may pass in name of file as option */
 	public static void main(String[] args) {
