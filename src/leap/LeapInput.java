@@ -158,6 +158,10 @@ public class LeapInput {
                 }else{
                     lastFinger = thisTip;
                 }
+            }else if (fingers.count()==0){
+                if (isDrawing){
+                    selectCounter++;
+                }
             }
 
             // Get the hand's sphere radius and palm position
@@ -299,17 +303,17 @@ public class LeapInput {
         Float lastDis2 = fingerDis.get(fingerDis.size()-3);
         if (thisDis-lastDis>ZOOM_THRESHOLD &&
                 lastDis-lastDis2>ZOOM_THRESHOLD*0.3){
-            if (zoomOutCooldown<=0){
-                fireEvent("zoomOut,"+Float.toString(thisDis-lastDis));
-                zoomOutCooldown = maxZoomCooldown/3;
-                zoomInCooldown = maxZoomCooldown;
+            if (zoomInCooldown<=0){
+                fireEvent("zoomIn,"+Float.toString(thisDis-lastDis));
+                zoomInCooldown = maxZoomCooldown/3;
+                zoomOutCooldown = maxZoomCooldown;
             }
         }else if (thisDis-lastDis<-ZOOM_THRESHOLD &&
                 lastDis-lastDis2<-ZOOM_THRESHOLD*0.3){
-            if (zoomInCooldown<=0){
-                fireEvent("zoomIn,"+Float.toString(lastDis-thisDis));
-                zoomInCooldown = maxZoomCooldown/3;
-                zoomOutCooldown = maxZoomCooldown;
+            if (zoomOutCooldown<=0){
+                fireEvent("zoomOut,"+Float.toString(lastDis-thisDis));
+                zoomOutCooldown = maxZoomCooldown/3;
+                zoomInCooldown = maxZoomCooldown;
             }
         }
         
