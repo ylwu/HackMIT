@@ -257,7 +257,7 @@ public class GUI extends JFrame{
 		private JButton initOpenBut() {
 			JButton open = new JButton();
 			open.setIcon(new ImageIcon(getClass().getResource(
-					"/org/jpedal/examples/viewer/res/open.gif"))); //$NON-NLS-1$
+					"pictures/open.jpeg"))); //$NON-NLS-1$
 			open.setText("Open");
 			open.setToolTipText("Open a file");
 			open.setBorderPainted(false);
