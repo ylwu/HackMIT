@@ -916,13 +916,12 @@ public class JPanelDemo extends JFrame {
 	}
 
 	/** create a standalone program. User may pass in name of file as option */
-	public static void main(String[] args) {
-		/** Run the software */
+/*	public static void main(String[] args) {
+		*//** Run the software *//*
 		if (args.length > 0) {
 			new JPanelDemo(args[0]);
 		} else {
 			new JPanelDemo();
 		}
-
-	}
+	}*/
 }
