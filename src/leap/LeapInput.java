@@ -26,7 +26,7 @@ public class LeapInput {
     Frame frame;
     Frame lastFrame;
     LeapListener listener;
-    long interval = 200;
+    long interval = 100;
     // Cooldown set to keep pages from flipping back due to hand repositioning
     long maxSwipeCooldown = 1000;
     long swipeCooldown;
@@ -143,41 +143,31 @@ public class LeapInput {
                 Vector thisTip = fingers.get(0).tipPosition();
                 if (isDrawing){
                     updateDrawing(thisTip);
+                    return;
                 }else{
-                    fireEvent("hover,"+Float.toString(thisTip.getX())+","+Float.toString(thisTip.getY()));
+                    fireEvent("hover,"+Float.toString(thisTip.getX()*1.3f)+","+Float.toString(thisTip.getY()*1.3f));
                 }
-                if (selectCounter==MAX_SELECT_COUNTER){
-                    isDrawing = true;
-                    areaStart = thisTip;
-                    fireEvent("start,"+Float.toString(areaStart.getX())+","+Float.toString(areaStart.getY()));
-                    selectCounter = 0;
-                }
-                if (lastFinger!=null){
-                    if (thisTip.distanceTo(lastFinger)<SELECT_HOLD_RANGE){
-                        selectCounter++;
+                if (!inOperation){
+                    if (selectCounter==MAX_SELECT_COUNTER){
+                        isDrawing = true;
+                        areaStart = thisTip;
+                        fireEvent("start,"+Float.toString(areaStart.getX()*1.3f)+","+Float.toString(areaStart.getY()*1.3f));
+                        selectCounter = 0;
                     }
-                    lastFinger = thisTip;
-                }else{
-                    lastFinger = thisTip;
+                    if (lastFinger!=null){
+                        if (thisTip.distanceTo(lastFinger)<SELECT_HOLD_RANGE){
+                            selectCounter++;
+                        }
+                        lastFinger = thisTip;
+                    }else{
+                        lastFinger = thisTip;
+                    }
                 }
             }else if (fingers.count()==0){
                 if (isDrawing){
                     selectCounter++;
                 }
             }
-
-            // Get the hand's sphere radius and palm position
-//            System.out.println("Hand sphere radius: " + hand.sphereRadius()
-//                             + " mm, palm position: " + hand.palmPosition());
-
-            // Get the hand's normal vector and direction
-            Vector normal = hand.palmNormal();
-            Vector direction = hand.direction();
-
-            // Calculate the hand's pitch, roll, and yaw angles
-            //System.out.println("Hand pitch: " + Math.toDegrees(direction.pitch()) + " degrees, "
-            //                 + "roll: " + Math.toDegrees(normal.roll()) + " degrees, "
-            //                 + "yaw: " + Math.toDegrees(direction.yaw()) + " degrees");
         }
     }
     
@@ -233,9 +223,9 @@ public class LeapInput {
     public void updateDrawing(Vector fingerTip){
         if (selectCounter==MAX_SELECT_COUNTER){
             if (fingerTip.distanceTo(areaStart)>SELECT_HOLD_RANGE*2){
-                fireEvent("finish,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
+                fireEvent("finish,"+Float.toString(fingerTip.getX()*1.3f)+","+Float.toString(fingerTip.getY()*1.3f));
             }else {
-                fireEvent("abort,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
+                fireEvent("abort,"+Float.toString(fingerTip.getX()*1.3f)+","+Float.toString(fingerTip.getY()*1.3f));
             }
             resetSelect();
             return;
@@ -245,7 +235,7 @@ public class LeapInput {
         }else{
             selectCounter = 0;
         }
-        fireEvent("drag,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
+        fireEvent("drag,"+Float.toString(fingerTip.getX()*1.3f)+","+Float.toString(fingerTip.getY()*1.3f));
         lastFinger = fingerTip;
     }
     
@@ -264,7 +254,6 @@ public class LeapInput {
         if (isDrawing) return;
         if (lastHands.size()<=3) return;
         //System.out.println("checking hand");
-        int mid = lastHands.size()/2;
         Vector thisHand = lastHands.getLast();
         Vector lastHand = lastHands.get(lastHands.size()-2);
         Vector lastHand2 = lastHands.get(lastHands.size()-3);
@@ -290,6 +279,8 @@ public class LeapInput {
                 scrollUpCooldown = maxScrollCooldown;
                 scrollDownCooldown = maxScrollCooldown;
                 swipeCooldown = maxSwipeCooldown;
+                isDrawing = false;
+                resetSelect();
             }
         }
             
