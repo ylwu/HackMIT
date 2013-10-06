@@ -27,10 +27,24 @@ public class LeapInput {
     Frame lastFrame;
     LeapListener listener;
     long interval = 200;
+    // Cooldown set to keep pages from flipping back due to hand repositioning
     long maxSwipeCooldown = 1000;
     long swipeCooldown;
-    boolean decreaseQueue = false;
+    // Cooldown set to keep zoom from bouncing back due to finger relaxing
+    long maxZoomCooldown = 1000;
+    long zoomInCooldown;
+    long zoomOutCooldown;
+    long maxScrollCooldown = 500;
+    long scrollCooldown;
+    // Frequency of queue cleaning
+    int decreaseFreq = 2;
+    int decreaseQueue = 1;
     int[] gesCount;
+    // Allow zoom and drag when true
+    boolean inOperation = false;
+    float OPERATION_THRESHOLD = 30;
+    float SCROLL_THRESHOLD = 10;
+    float ZOOM_THRESHOLD = 10;
     LinkedList<Vector> lastHands;
     LinkedList<Vector> lastFingerA;
     LinkedList<Vector> lastFingerB;
@@ -65,6 +79,9 @@ public class LeapInput {
         lastFingerB = new LinkedList<Vector>();
         fingerDis = new LinkedList<Float>();
         swipeCooldown = 0;
+        zoomInCooldown = 0;
+        zoomOutCooldown = 0;
+        scrollCooldown = 0;
         tempCount = 0;
     }
     
@@ -75,24 +92,27 @@ public class LeapInput {
 
             // Check if the hand has any fingers
             FingerList fingers = hand.fingers();
-            if (fingers.count()>1) {
+            Vector handPos = hand.palmPosition();
+            if (lastHands.size()>10){
+                lastHands.remove();
+            }
+            lastHands.add(handPos);
+            checkHand();
+            //System.out.println(fingers.count());
+            if (fingers.count()>1 && inOperation) {
                 // Calculate the hand's average finger tip position
-                Vector avgPos = Vector.zero();
-                for (Finger finger : fingers) {
-                    avgPos = avgPos.plus(finger.tipPosition());
-                }
+                //Vector avgPos = Vector.zero();
+                //for (Finger finger : fingers) {
+                //    avgPos = avgPos.plus(finger.tipPosition());
+                //}
                 Finger fingerA = fingers.get(0);
                 Finger fingerB = fingers.get(1);
                 Vector fingerAPos = fingerA.tipPosition();
                 Vector fingerBPos = fingerB.tipPosition();
-                avgPos = avgPos.divide(fingers.count());
-                System.out.println("Hand has " + fingers.count()
-                                 + " fingers, average finger tip position: " + avgPos);
-                if (lastHands.size()>10){
-                    lastHands.remove();
-                }
-                lastHands.add(avgPos);
-                checkHand();
+                //avgPos = avgPos.divide(fingers.count());
+//                System.out.println("Hand has " + fingers.count()
+//                                 + " fingers, palm position: " + handPos);
+                
                 
                 if (fingers.count()==2){
                     if (lastFingerA.size()>10){
@@ -106,15 +126,16 @@ public class LeapInput {
                     lastFingerB.add(fingerBPos);
                     float finDiff = fingerAPos.distanceTo(fingerBPos);
                     if (fingerDis.size()>10){
-                        fingerDis.add(finDiff);
+                        fingerDis.remove();
                     }
+                    fingerDis.add(finDiff);
                     checkZoomer();
                 }
             }
 
             // Get the hand's sphere radius and palm position
-            System.out.println("Hand sphere radius: " + hand.sphereRadius()
-                             + " mm, palm position: " + hand.palmPosition());
+//            System.out.println("Hand sphere radius: " + hand.sphereRadius()
+//                             + " mm, palm position: " + hand.palmPosition());
 
             // Get the hand's normal vector and direction
             Vector normal = hand.palmNormal();
@@ -193,16 +214,79 @@ public class LeapInput {
     
     public void checkHand(){
         if (lastHands.size()<=3) return;
+        //System.out.println("checking hand");
         int mid = lastHands.size()/2;
-        
+        Vector thisHand = lastHands.getLast();
+        Vector lastHand = lastHands.get(lastHands.size()-2);
+        Vector lastHand2 = lastHands.get(lastHands.size()-3);
+        if (thisHand.minus(lastHand).getZ()<(-OPERATION_THRESHOLD) &&
+                lastHand.minus(lastHand2).getZ()<(-0.5*OPERATION_THRESHOLD)){
+            if (!inOperation) {
+                System.out.println("Operation true");
+                inOperation = true;
+                zoomInCooldown = maxZoomCooldown;
+                zoomOutCooldown = maxZoomCooldown;
+                scrollCooldown = maxScrollCooldown;
+                swipeCooldown = maxSwipeCooldown;
+            }
+        }else if (thisHand.minus(lastHand).getZ()>(OPERATION_THRESHOLD) &&
+                lastHand.minus(lastHand2).getZ()>(0.5*OPERATION_THRESHOLD)){
+            if (inOperation){
+                System.out.println("Operation false");
+                inOperation = false;
+                zoomInCooldown = maxZoomCooldown;
+                zoomOutCooldown = maxZoomCooldown;
+                scrollCooldown = maxScrollCooldown;
+                swipeCooldown = maxSwipeCooldown;
+            }
+        }
+            
     }
     
     public void checkZoomer(){
-        if (lastFingerA.size()==0 || lastFingerB.size()==0 
-                || fingerDis.size()==0){
+        if (lastFingerA.size()<3 || lastFingerB.size()<3
+                || fingerDis.size()<3){
             return;
         }
-        float current;
+        //System.out.println("Checking zoomer");
+
+        Float thisDis = fingerDis.getLast();
+        Float lastDis = fingerDis.get(fingerDis.size()-2);
+        Float lastDis2 = fingerDis.get(fingerDis.size()-3);
+        if (thisDis-lastDis>ZOOM_THRESHOLD &&
+                lastDis-lastDis2>ZOOM_THRESHOLD*0.3){
+            if (zoomOutCooldown<=0){
+                fireEvent("zoomOut,"+Float.toString(thisDis-lastDis));
+                zoomOutCooldown = maxZoomCooldown/2;
+                zoomInCooldown = maxZoomCooldown;
+            }
+        }else if (thisDis-lastDis<-ZOOM_THRESHOLD &&
+                lastDis-lastDis2<-ZOOM_THRESHOLD*0.3){
+            if (zoomInCooldown<=0){
+                fireEvent("zoomIn,"+Float.toString(lastDis-thisDis));
+                zoomInCooldown = maxZoomCooldown/2;
+                zoomOutCooldown = maxZoomCooldown;
+            }
+        }
+        
+        
+        Vector thisA = lastFingerA.getLast();
+        Vector lastA = lastFingerA.get(lastFingerA.size()-2);
+        Vector lastA2 = lastFingerA.get(lastFingerA.size()-3);
+        
+        Vector thisB = lastFingerB.getLast();
+        Vector lastB = lastFingerB.get(lastFingerB.size()-2);
+        Vector lastB2 = lastFingerB.get(lastFingerB.size()-3);
+        
+        Vector thisMid = thisA.plus(thisB).divide(2);
+        Vector lastMid = lastA.plus(lastB).divide(2);
+        Vector lastMid2 = lastA2.plus(lastB2).divide(2);
+        Vector thisMove = thisMid.minus(lastMid);
+        Vector lastMove = lastMid.minus(lastMid2);
+        Vector weightedMove = thisMove.plus(lastMove.times(0.3f)).divide(1.3f);
+        if (weightedMove.getX()*weightedMove.getX()+weightedMove.getY()*weightedMove.getY()>400 && scrollCooldown<=0){
+            fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+        }
     }
     
     public void onScreenTap(ScreenTapGesture tap){
@@ -229,14 +313,23 @@ public class LeapInput {
             System.out.println("same");
             return;
         }
-        //processHand();
+        processHand();
         processGestures();
         lastFrame = frame;
 
         if (swipeCooldown>0){
             swipeCooldown-=interval;
         }
-        if (decreaseQueue){
+        if (zoomInCooldown>0){
+            zoomInCooldown-=interval;
+        }
+        if (zoomOutCooldown>0){
+            zoomOutCooldown-=interval;
+        }
+        if (scrollCooldown>0){
+            scrollCooldown-=interval;
+        }
+        if (decreaseQueue%decreaseFreq==0){
             if (lastFingerA.size()>0){
                 lastFingerA.remove();
             }
@@ -244,7 +337,7 @@ public class LeapInput {
                 lastFingerB.remove();
             }
         }
-        decreaseQueue = !decreaseQueue;
+        decreaseQueue++;
     }
     
     public void start(){
@@ -268,11 +361,12 @@ public class LeapInput {
     // call this method whenever you want to notify
     //the event listeners of the particular event
     private synchronized void fireEvent(String message) {
-      LeapEvent event = new LeapEvent(this, message);
-      Iterator i = _listeners.iterator();
-      while(i.hasNext())  {
-        ((LeapEventListener) i.next()).handleLeapEvent(event);
-      }
+        System.out.println(message);
+        LeapEvent event = new LeapEvent(this, message);
+        Iterator i = _listeners.iterator();
+        while(i.hasNext())  {
+            ((LeapEventListener) i.next()).handleLeapEvent(event);
+        }
     }
     
     public static void main(String[] args){
