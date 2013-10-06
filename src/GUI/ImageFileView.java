@@ -38,9 +38,6 @@ import javax.swing.filechooser.*;
 public class ImageFileView extends FileView {
     ImageIcon pdfIcon = Utils.createImageIcon("pictures/pdf.png");
     ImageIcon folderIcon = Utils.createImageIcon("pictures/folder.png");
-    public ImageIcon getFolderIcon() {
-        return folderIcon;
-    }
 
     public String getName(File f) {
         return null; //let the L&F FileView figure this out
@@ -65,16 +62,22 @@ public class ImageFileView extends FileView {
         }
         return type;
     }
-
+    
     public Icon getIcon(File f) {
-        String extension = Utils.getExtension(f);
-        Icon icon = null;
-
-        if (extension != null) {
-            if (extension.equals(Utils.pdf)) {
-                icon = pdfIcon;
-            } 
-        }
-        return icon;
+        
+        FileSystemView view=FileSystemView.getFileSystemView();
+        return view.getSystemIcon(f);
+//        String extension = Utils.getExtension(f);
+//        Icon icon = null;
+//        if (f.isDirectory()){
+//            icon = folderIcon;
+//        }
+//
+//        else if (extension != null) {
+//            if (extension.equals(Utils.pdf)) {
+//                icon = pdfIcon;
+//            } 
+//        }
+//        return icon;
     }
 }

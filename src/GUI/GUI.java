@@ -5,13 +5,13 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.net.URL;
 
+import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import leap.LeapEvent;
@@ -128,6 +129,7 @@ public class GUI extends JFrame{
 			open.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			open.setFileView(new ImageFileView());
 			open.setAcceptAllFileFilterUsed(false);
+            ImageIcon upIcon = Utils.createImageIcon("pictures/updir.jpg");
 			String[] pdf = new String[] { "pdf" };
 			open.addChoosableFileFilter(new FileFilterer(pdf, "Pdf (*.pdf)"));
 			int resultOfFileSelect = JFileChooser.ERROR_OPTION;
