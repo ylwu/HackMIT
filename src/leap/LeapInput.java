@@ -31,11 +31,12 @@ public class LeapInput {
     long maxSwipeCooldown = 1000;
     long swipeCooldown;
     // Cooldown set to keep zoom from bouncing back due to finger relaxing
-    long maxZoomCooldown = 1000;
+    long maxZoomCooldown = 1200;
     long zoomInCooldown;
     long zoomOutCooldown;
-    long maxScrollCooldown = 500;
-    long scrollCooldown;
+    long maxScrollCooldown = 1500;
+    long scrollUpCooldown;
+    long scrollDownCooldown;
     // Frequency of queue cleaning
     int decreaseFreq = 2;
     int decreaseQueue = 1;
@@ -43,12 +44,30 @@ public class LeapInput {
     // Allow zoom and drag when true
     boolean inOperation = false;
     float OPERATION_THRESHOLD = 30;
-    float SCROLL_THRESHOLD = 10;
-    float ZOOM_THRESHOLD = 10;
+    float SCROLL_THRESHOLD = 9;
+    float ZOOM_THRESHOLD = 8;
     LinkedList<Vector> lastHands;
     LinkedList<Vector> lastFingerA;
     LinkedList<Vector> lastFingerB;
     LinkedList<Float> fingerDis;
+    
+    boolean isDrawing = false;
+    //Starting point of the extract zone
+    Vector areaStart;
+    Vector lastFinger;
+    int selectCounter;
+    int SELECT_HOLD_RANGE = 8;
+    int MAX_SELECT_COUNTER = 12;
+    float xMin = -250;
+    float curXMin;
+    float xMax = 250;
+    float curXMax;
+    float yMin = -350;
+    float curYMin;
+    float yMax = 350;
+    float curYMax;
+    int sidesCompleted;
+    int faultTillNow;
     
     int tempCount;
     
@@ -60,16 +79,8 @@ public class LeapInput {
 
         // Have the sample listener receive events from the controller
         controller.addListener(listener);
-        if(controller.config().setFloat("Gesture.ScreenTap.MinForwardVelocity", 20.0f) &&
-                controller.config().setFloat("Gesture.ScreenTap.HistorySeconds", .2f) &&
-                controller.config().setFloat("Gesture.ScreenTap.MinDistance", 4.0f) &&
-                controller.config().setFloat("Gesture.KeyTap.MinDownVelocity", 30.0f) &&
-                controller.config().setFloat("Gesture.KeyTap.HistorySeconds", .3f) &&
-                controller.config().setFloat("Gesture.KeyTap.MinDistance", 4.0f) &&
-                controller.config().setFloat("Gesture.Swipe.MinLength", 100.0f) &&
-                controller.config().setFloat("Gesture.Swipe.MinVelocity", 500f) &&
-                controller.config().setFloat("Gesture.Circle.MinRadius", 10.0f) &&
-                controller.config().setFloat("Gesture.Circle.MinArc", 4.5f))
+        if(controller.config().setFloat("Gesture.Swipe.MinLength", 100.0f) &&
+                controller.config().setFloat("Gesture.Swipe.MinVelocity", 500f))
             controller.config().save();
         frame = controller.frame();
         lastFrame = frame;
@@ -81,10 +92,13 @@ public class LeapInput {
         swipeCooldown = 0;
         zoomInCooldown = 0;
         zoomOutCooldown = 0;
-        scrollCooldown = 0;
+        scrollUpCooldown = 0;
+        scrollDownCooldown = 0;
         tempCount = 0;
+        resetSelect();
     }
     
+    // Takes care of toggling zooming/scrolling on and off
     public void processHand(){
         if (!frame.hands().empty()) {
             // Get the first hand
@@ -99,37 +113,56 @@ public class LeapInput {
             lastHands.add(handPos);
             checkHand();
             //System.out.println(fingers.count());
-            if (fingers.count()>1 && inOperation) {
-                // Calculate the hand's average finger tip position
-                //Vector avgPos = Vector.zero();
-                //for (Finger finger : fingers) {
-                //    avgPos = avgPos.plus(finger.tipPosition());
-                //}
+            
+            // For page flipping, zooming and on-page scrolling
+            if (fingers.count()==2 && inOperation && !isDrawing) {
                 Finger fingerA = fingers.get(0);
                 Finger fingerB = fingers.get(1);
                 Vector fingerAPos = fingerA.tipPosition();
                 Vector fingerBPos = fingerB.tipPosition();
-                //avgPos = avgPos.divide(fingers.count());
-//                System.out.println("Hand has " + fingers.count()
-//                                 + " fingers, palm position: " + handPos);
                 
                 
-                if (fingers.count()==2){
-                    if (lastFingerA.size()>10){
-                        lastFingerA.remove();
+                if (lastFingerA.size()>10){
+                    lastFingerA.remove();
+                }
+                lastFingerA.add(fingerAPos);
+                
+                if (lastFingerB.size()>10){
+                    lastFingerB.remove();
+                }
+                lastFingerB.add(fingerBPos);
+                float finDiff = fingerAPos.distanceTo(fingerBPos);
+                if (fingerDis.size()>10){
+                    fingerDis.remove();
+                }
+                fingerDis.add(finDiff);
+                checkZoomer();
+            }
+            // For specifying an area to extract
+            else if (fingers.count()==1){
+                Vector thisTip = fingers.get(0).tipPosition();
+                if (isDrawing){
+                    updateDrawing(thisTip);
+                }else{
+                    fireEvent("hover,"+Float.toString(thisTip.getX())+","+Float.toString(thisTip.getY()));
+                }
+                if (selectCounter==MAX_SELECT_COUNTER){
+                    isDrawing = true;
+                    areaStart = thisTip;
+                    fireEvent("start,"+Float.toString(areaStart.getX())+","+Float.toString(areaStart.getY()));
+                    selectCounter = 0;
+                }
+                if (lastFinger!=null){
+                    if (thisTip.distanceTo(lastFinger)<SELECT_HOLD_RANGE){
+                        selectCounter++;
                     }
-                    lastFingerA.add(fingerAPos);
-                    
-                    if (lastFingerB.size()>10){
-                        lastFingerB.remove();
-                    }
-                    lastFingerB.add(fingerBPos);
-                    float finDiff = fingerAPos.distanceTo(fingerBPos);
-                    if (fingerDis.size()>10){
-                        fingerDis.remove();
-                    }
-                    fingerDis.add(finDiff);
-                    checkZoomer();
+                    lastFinger = thisTip;
+                }else{
+                    lastFinger = thisTip;
+                }
+            }else if (fingers.count()==0){
+                if (isDrawing){
+                    selectCounter++;
                 }
             }
 
@@ -149,6 +182,7 @@ public class LeapInput {
     }
     
     public void processGestures(){
+        //if (isDrawing) return;
         GestureList gestures = lastFrame.isValid()?
                 frame.gestures(lastFrame) :
                 frame.gestures();
@@ -169,24 +203,6 @@ public class LeapInput {
                 swipeCooldown = maxSwipeCooldown;
             }
         }
-//        for (int i=0; i<numGestures;i++){
-//            if (gestures.get(i).type()==Gesture.Type.TYPE_SCREEN_TAP){
-//                ScreenTapGesture tap = new ScreenTapGesture(gestures.get(i));
-//                onScreenTap(tap);
-//            }else if (gestures.get(i).type()==Gesture.Type.TYPE_KEY_TAP){
-//                KeyTapGesture tap = new KeyTapGesture(gestures.get(i));
-//                onKeyTap(tap);
-//            }else if (gestures.get(i).type()==Gesture.Type.TYPE_SWIPE){
-//                SwipeGesture tap = new SwipeGesture(gestures.get(i));
-//                if (tap.pointables().count()>3){
-//                    System.out.println("tap: "+Integer.toString(tap.pointables().count()));
-//                    onSwipe(tap);
-//                }
-//            }else if (gestures.get(i).type()==Gesture.Type.TYPE_CIRCLE){
-//                CircleGesture tap = new CircleGesture(gestures.get(i));
-//                onCircle(tap);
-//            }
-//        }
         
     }
     
@@ -205,14 +221,47 @@ public class LeapInput {
         //System.out.println(totEnd.toString());
         Vector result = (totEnd.minus(totStart)).divide(vSize);
         fireEvent("swipe,"+Float.toString(result.getX())+","+Float.toString(result.getY()));
-        System.out.println(result.toString());
     }
     
-    public void updatePointer(){
-        
+    
+    // For drawing the extract area
+    // -To start: hold 1 finger on a spot for 1.5 secs. Need to be in the operating state. 
+    //    Disables operating state switch after starting
+    // -To draw: drag finger to the bottom right corner
+    // -To finish: hold on a spot for 1.5 secs.
+    // -To abort: hold on the starting spot for 1.5 secs .
+    public void updateDrawing(Vector fingerTip){
+        if (selectCounter==MAX_SELECT_COUNTER){
+            if (fingerTip.distanceTo(areaStart)>SELECT_HOLD_RANGE*2){
+                fireEvent("finish,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
+            }else {
+                fireEvent("abort,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
+            }
+            resetSelect();
+            return;
+        }
+        if (fingerTip.distanceTo(lastFinger)<SELECT_HOLD_RANGE){
+            selectCounter++;
+        }else{
+            selectCounter = 0;
+        }
+        fireEvent("drag,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
+        lastFinger = fingerTip;
+    }
+    
+    private void resetSelect(){
+        isDrawing = false;
+        selectCounter = 0;
+        curXMin = xMax;
+        curXMax = xMin;
+        curYMin = yMax;
+        curYMax = yMin;
+        sidesCompleted = 0;
+        faultTillNow = 0;
     }
     
     public void checkHand(){
+        if (isDrawing) return;
         if (lastHands.size()<=3) return;
         //System.out.println("checking hand");
         int mid = lastHands.size()/2;
@@ -222,21 +271,24 @@ public class LeapInput {
         if (thisHand.minus(lastHand).getZ()<(-OPERATION_THRESHOLD) &&
                 lastHand.minus(lastHand2).getZ()<(-0.5*OPERATION_THRESHOLD)){
             if (!inOperation) {
+                fireEvent("enable");
                 System.out.println("Operation true");
                 inOperation = true;
                 zoomInCooldown = maxZoomCooldown;
                 zoomOutCooldown = maxZoomCooldown;
-                scrollCooldown = maxScrollCooldown;
+                scrollUpCooldown = maxScrollCooldown;
+                scrollDownCooldown = maxScrollCooldown;
                 swipeCooldown = maxSwipeCooldown;
             }
         }else if (thisHand.minus(lastHand).getZ()>(OPERATION_THRESHOLD) &&
                 lastHand.minus(lastHand2).getZ()>(0.5*OPERATION_THRESHOLD)){
             if (inOperation){
-                System.out.println("Operation false");
+                fireEvent("disable");
                 inOperation = false;
                 zoomInCooldown = maxZoomCooldown;
                 zoomOutCooldown = maxZoomCooldown;
-                scrollCooldown = maxScrollCooldown;
+                scrollUpCooldown = maxScrollCooldown;
+                scrollDownCooldown = maxScrollCooldown;
                 swipeCooldown = maxSwipeCooldown;
             }
         }
@@ -255,17 +307,17 @@ public class LeapInput {
         Float lastDis2 = fingerDis.get(fingerDis.size()-3);
         if (thisDis-lastDis>ZOOM_THRESHOLD &&
                 lastDis-lastDis2>ZOOM_THRESHOLD*0.3){
-            if (zoomOutCooldown<=0){
-                fireEvent("zoomOut,"+Float.toString(thisDis-lastDis));
-                zoomOutCooldown = maxZoomCooldown/2;
-                zoomInCooldown = maxZoomCooldown;
+            if (zoomInCooldown<=0){
+                fireEvent("zoomIn,"+Float.toString(thisDis-lastDis));
+                zoomInCooldown = maxZoomCooldown/3;
+                zoomOutCooldown = maxZoomCooldown;
             }
         }else if (thisDis-lastDis<-ZOOM_THRESHOLD &&
                 lastDis-lastDis2<-ZOOM_THRESHOLD*0.3){
-            if (zoomInCooldown<=0){
-                fireEvent("zoomIn,"+Float.toString(lastDis-thisDis));
-                zoomInCooldown = maxZoomCooldown/2;
-                zoomOutCooldown = maxZoomCooldown;
+            if (zoomOutCooldown<=0){
+                fireEvent("zoomOut,"+Float.toString(lastDis-thisDis));
+                zoomOutCooldown = maxZoomCooldown/3;
+                zoomInCooldown = maxZoomCooldown;
             }
         }
         
@@ -284,8 +336,14 @@ public class LeapInput {
         Vector thisMove = thisMid.minus(lastMid);
         Vector lastMove = lastMid.minus(lastMid2);
         Vector weightedMove = thisMove.plus(lastMove.times(0.3f)).divide(1.3f);
-        if (weightedMove.getX()*weightedMove.getX()+weightedMove.getY()*weightedMove.getY()>400 && scrollCooldown<=0){
-            fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+        if (weightedMove.getX()*weightedMove.getX()+weightedMove.getY()*weightedMove.getY()>SCROLL_THRESHOLD*SCROLL_THRESHOLD){
+            if (weightedMove.getY()>0 && scrollUpCooldown<=0){
+                fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+                scrollDownCooldown = maxScrollCooldown;
+            }else if (weightedMove.getY()<0 && scrollDownCooldown<=0){
+                fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+                scrollUpCooldown = maxScrollCooldown;
+            }
         }
     }
     
@@ -326,8 +384,11 @@ public class LeapInput {
         if (zoomOutCooldown>0){
             zoomOutCooldown-=interval;
         }
-        if (scrollCooldown>0){
-            scrollCooldown-=interval;
+        if (scrollUpCooldown>0){
+            scrollUpCooldown-=interval;
+        }
+        if (scrollDownCooldown>0){
+            scrollDownCooldown-=interval;
         }
         if (decreaseQueue%decreaseFreq==0){
             if (lastFingerA.size()>0){
@@ -361,7 +422,7 @@ public class LeapInput {
     // call this method whenever you want to notify
     //the event listeners of the particular event
     private synchronized void fireEvent(String message) {
-        System.out.println(message);
+        //System.out.println(message);
         LeapEvent event = new LeapEvent(this, message);
         Iterator i = _listeners.iterator();
         while(i.hasNext())  {
