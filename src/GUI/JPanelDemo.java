@@ -101,6 +101,9 @@ public class JPanelDemo extends JFrame {
 		// setup our GUI display
 		initializeViewer();
 		// set page number display
+		LeapInput leap = new LeapInput();
+        leap.start();
+        leap.addEventListener(new LeapMotion());
 	}
 
 	/**
@@ -217,11 +220,15 @@ public class JPanelDemo extends JFrame {
 
 		cPane = getContentPane();
 		cPane.setLayout(new BorderLayout());
-
+		
+		LeapInput leap = new LeapInput();
+        leap.start();
+        leap.addEventListener(new LeapMotion());
+		
 		JButton open = initOpenBut();// setup open button
 		Component[] itemsToAdd = initChangerPanel();// setup page display and
 													// changer
-
+		
 		JPanel topBar = new JPanel();
 		topBar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		topBar.add(open);
@@ -887,15 +894,11 @@ public class JPanelDemo extends JFrame {
 
 	/** create a standalone program. User may pass in name of file as option */
 	public static void main(String[] args) {
-		JPanelDemo JP;
 		/** Run the software */
 		if (args.length > 0) {
-			JP = new JPanelDemo(args[0]);
+			new JPanelDemo(args[0]);
 		} else {
-			JP = new JPanelDemo();
+			new JPanelDemo();
 		}
-		LeapInput leap = new LeapInput();
-        leap.start();
-        leap.addEventListener(JP.new LeapMotion());
 	}
 }
