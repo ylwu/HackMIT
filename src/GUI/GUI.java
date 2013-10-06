@@ -1,17 +1,24 @@
 package GUI;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import leap.LeapEvent;
@@ -53,6 +60,8 @@ public class GUI extends JFrame{
 		setVisible(true);
 	}
 	
+    
+	
 	public class JPanelDemo extends JFrame {
 
 		private String viewerTitle = "Jpanel Demo";
@@ -81,13 +90,51 @@ public class GUI extends JFrame{
 		private final JLabel scaling2 = new JLabel("%"); 
 		private boolean enable;
 		private JButton mode;
+		
+		private final Stroke LINE_STROKE = new BasicStroke(10);
+	    private static final int PageHeight = 538;
+	    private static final int PageWidth = 956;
+	    private int hoverPointX = 0;
+	    private int hoverPointY = 0;
+	    private int startPointX = 0;
+	    private int startPointY = 0;
+	    private int endPointX = 0;
+	    private int endPointY = 0;
+	    
+	    public class Page extends PdfDecoder{
+	        
+	        
+	        public Page(boolean b){
+	            super(b);
+	        }
+	        
+	        @Override
+	        public void paintComponent(Graphics g) {
+	           super.paintComponent(g);
+	           if (startPointX !=0){
+	               drawPoint(startPointX,startPointY,g);
+	           }
+	           if (hoverPointX !=0){
+	               drawPoint(hoverPointX,hoverPointY,g);
+	           }
+	        }
+	    }
+	    
+	    public void drawPoint(int x, int y, Graphics g){
+	        Graphics2D g2 = (Graphics2D) g;
+            g2.setStroke(LINE_STROKE);
+            g2.setColor(Color.red);
+            g2.drawLine(x,y,x,y);
+	    }
 
 		/**
 		 * construct a pdf viewer, passing in the full file name
 		 */
 		public JPanelDemo(String name) {
             mode =initMode();
-			pdfDecoder = new PdfDecoder(true);
+			pdfDecoder = new Page(true);
+			System.out.println(pdfDecoder.getSize().height);
+	        System.out.println(pdfDecoder.getSize().width);
 			// ensure non-embedded font map to sensible replacements
 			FontMappings.setFontReplacements();
 			currentFile = name;// store file name for use in page changer
@@ -105,7 +152,7 @@ public class GUI extends JFrame{
 		public JPanelDemo() {
             mode =initMode();
 			setTitle(viewerTitle);
-			pdfDecoder = new PdfDecoder(true);
+			pdfDecoder = new Page(true);
 			// ensure non-embedded font map to sensible replacements
 			FontMappings.setFontReplacements();
 			initializeViewer();
@@ -570,7 +617,7 @@ public class GUI extends JFrame{
 			
 			JButton scrollUp = new JButton();
 			URL scrollUpImage = getClass().getResource("/pictures/uparrow.jpeg");
-			scrollUp.setIcon(new ImageIcon(scrollUpImage));
+			////scrollUp.setIcon(new ImageIcon(scrollUpImage));
 			scrollUp.setToolTipText("scroll up");
 			scrollUp.addActionListener(new ActionListener() {
 				@Override
@@ -587,7 +634,7 @@ public class GUI extends JFrame{
 			
 			JButton scrollDown = new JButton();
 			URL scrollDownImage = getClass().getResource("/pictures/downarrow.jpeg");
-			scrollDown.setIcon(new ImageIcon(scrollDownImage));
+			////scrollDown.setIcon(new ImageIcon(scrollDownImage));
 			scrollDown.setToolTipText("scroll down");
 			scrollDown.addActionListener(new ActionListener() {
 				@Override
@@ -605,7 +652,7 @@ public class GUI extends JFrame{
 			
 			JButton scrollLeft = new JButton();
 			URL scrollLeftImage = getClass().getResource("/pictures/leftarrow.jpeg");
-			scrollLeft.setIcon(new ImageIcon(scrollLeftImage));
+			////scrollLeft.setIcon(new ImageIcon(scrollLeftImage));
 			scrollLeft.setToolTipText("scroll left");
 			scrollLeft.addActionListener(new ActionListener() {
 				@Override
@@ -622,7 +669,7 @@ public class GUI extends JFrame{
 			
 			JButton scrollRight = new JButton();
 			URL scrollRightImage = getClass().getResource("/pictures/rightarrow.jpeg");
-			scrollRight.setIcon(new ImageIcon(scrollRightImage));
+			////scrollRight.setIcon(new ImageIcon(scrollRightImage));
 			scrollRight.setToolTipText("scroll right");
 			scrollRight.addActionListener(new ActionListener() {
 				@Override
@@ -646,6 +693,20 @@ public class GUI extends JFrame{
 			
 			return list;
 		}
+		
+		public void extractSelectedScreenAsImage(int i,int k, int j, int m)
+	      {
+	   
+	    float f = 100.0F;
+	    final BufferedImage localBufferedImage = pdfDecoder.getSelectedRectangleOnscreen(i, k, j, m, f);
+	    File outputfile = new File("image.jpg");
+	    try {
+	        ImageIO.write(localBufferedImage, "jpg", outputfile);
+	    } catch (IOException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+	    }  
+	    }
 		
 		public void zoomIn(float zoomF){
 		    pdfDecoder.setDisplayView(1,1);
@@ -850,6 +911,38 @@ public class GUI extends JFrame{
 			enable = false;
 			mode.setText("Zoom Disabled");
 		}
+		
+		public void hoverPoint(int xl, int yl){
+		    hoverPointX = PageWidth/2 + xl;
+		    hoverPointY = PageHeight/2 - yl;
+		    repaint();
+		}
+		
+		public void startPoint(int xl, int yl){
+            startPointX = PageWidth/2 + xl;
+            startPointY = PageHeight/2 -yl;
+            repaint();
+        }
+		
+		public void endPoint(int xl, int yl){
+		    hoverPointX = 0;
+            hoverPointY = 0;
+            endPointX = PageWidth/2 + xl;
+            endPointY = PageHeight/2 - yl;
+            
+            repaint();
+            
+            float f = currentScale/100;
+            extractSelectedScreenAsImage(Math.round(startPointX/f), Math.round(startPointY/f), Math.round(endPointX/f), Math.round(endPointY/f));
+		
+            hoverPointX = 0;
+            hoverPointY = 0;
+            startPointX = 0;
+            startPointY = 0;
+            endPointX = 0;
+            endPointY = 0;
+            repaint();
+		}
 
 		public class LeapMotion implements LeapEventListener {
 		    
@@ -916,16 +1009,16 @@ public class GUI extends JFrame{
 					disable_mode();
 				}
 				else if (coordinate[0].equals("hover")){
-				    
+				    hoverPoint((int)Float.parseFloat(coordinate[1]),(int)Float.parseFloat(coordinate[2]));
 				}
 				else if (coordinate[0].equals("start")){
-				    
+				    startPoint((int)Float.parseFloat(coordinate[1]),(int)Float.parseFloat(coordinate[2]));
 				}
                 else if (coordinate[0].equals("drag")){
-                    
+                    hoverPoint((int)Float.parseFloat(coordinate[1]),(int)Float.parseFloat(coordinate[2]));
                 }
                 else if (coordinate[0].equals("finish")){
-                    
+                    endPoint((int)Float.parseFloat(coordinate[1]),(int)Float.parseFloat(coordinate[2]));
                 }
                 else if (coordinate[0].equals("abort")){
                     
