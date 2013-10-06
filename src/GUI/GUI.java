@@ -84,6 +84,7 @@ public class GUI extends JFrame{
 		 * construct a pdf viewer, passing in the full file name
 		 */
 		public JPanelDemo(String name) {
+            mode =initMode();
 			pdfDecoder = new PdfDecoder(true);
 			// ensure non-embedded font map to sensible replacements
 			FontMappings.setFontReplacements();
@@ -100,6 +101,7 @@ public class GUI extends JFrame{
 		 * construct an empty pdf viewer and pop up the open window
 		 */
 		public JPanelDemo() {
+            mode =initMode();
 			setTitle(viewerTitle);
 			pdfDecoder = new PdfDecoder(true);
 			// ensure non-embedded font map to sensible replacements
@@ -222,7 +224,7 @@ public class GUI extends JFrame{
 			JPanel topBar = new JPanel();
 			topBar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 			topBar.add(open);
-			topBar.add(initMode());
+			topBar.add(mode);
 			// topBar.add(pageChanger);
 			for (Component anItemsToAdd : itemsToAdd) {
 				topBar.add(anItemsToAdd);
@@ -852,12 +854,12 @@ public class GUI extends JFrame{
 
 				// forward 1 page
 				if (coordinate[0] .equals("swipe")
-						&& Float.parseFloat(coordinate[1]) > 100) {
+						&& Float.parseFloat(coordinate[1]) < 100) {
 					forwardPage();
 				}
 				// back 1 page
 				if (coordinate[0].equals("swipe")
-						&& Float.parseFloat(coordinate[1]) < -100) {
+						&& Float.parseFloat(coordinate[1]) > -100) {
 					backPage();
 				}
 				// back to first page

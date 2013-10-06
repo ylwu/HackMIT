@@ -34,7 +34,7 @@ public class LeapInput {
     long maxZoomCooldown = 1200;
     long zoomInCooldown;
     long zoomOutCooldown;
-    long maxScrollCooldown = 800;
+    long maxScrollCooldown = 1500;
     long scrollUpCooldown;
     long scrollDownCooldown;
     // Frequency of queue cleaning
@@ -44,7 +44,7 @@ public class LeapInput {
     // Allow zoom and drag when true
     boolean inOperation = false;
     float OPERATION_THRESHOLD = 30;
-    float SCROLL_THRESHOLD = 8;
+    float SCROLL_THRESHOLD = 9;
     float ZOOM_THRESHOLD = 8;
     LinkedList<Vector> lastHands;
     LinkedList<Vector> lastFingerA;
