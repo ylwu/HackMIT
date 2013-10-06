@@ -57,6 +57,7 @@ public class GUI extends JFrame{
 	private Container cPane = new Container();
 	private JButton start = new JButton("Start");
 	private Timer timer = new Timer();
+	private Image backgroundImage;
 	
 	public GUI(String name){
 
@@ -81,9 +82,16 @@ public class GUI extends JFrame{
 		
 		cPane.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		
-				//"pictures/Logo.png"
+		URL logo = getClass().getResource("pictures/Logo.png");
+		 ImageIcon image = new ImageIcon(logo);
+	        JLabel pic= new JLabel(image);
+	    JPanel pictures = new JPanel();
+	    pictures.add(pic);
+		cPane.add(pic, BorderLayout.CENTER);
+
+	    
 		
-		setSize(500, 500);
+		setSize(430, 420);
 		setLocationRelativeTo(null);// centre on screen
 		setVisible(true);
 		
@@ -677,7 +685,7 @@ public class GUI extends JFrame{
 			list[13] = scaling2;
 			
 			JButton scrollUp = new JButton();
-			URL scrollUpImage = getClass().getResource("pictures/uparrow.png");
+			URL scrollUpImage = getClass().getResource("pictures/uparrow.jpeg");
 			scrollUp.setIcon(new ImageIcon(scrollUpImage));
 			scrollUp.setToolTipText("scroll up");
 			scrollUp.addActionListener(new ActionListener() {
@@ -694,7 +702,7 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollDown = new JButton();
-			URL scrollDownImage = getClass().getResource("pictures/downarrow.png");
+			URL scrollDownImage = getClass().getResource("pictures/downarrow.jpeg");
 			scrollDown.setIcon(new ImageIcon(scrollDownImage));
 			scrollDown.setToolTipText("scroll down");
 			scrollDown.addActionListener(new ActionListener() {
@@ -712,7 +720,7 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollLeft = new JButton();
-			URL scrollLeftImage = getClass().getResource("pictures/leftarrow.png");
+			URL scrollLeftImage = getClass().getResource("pictures/leftarrow.jpeg");
 			scrollLeft.setIcon(new ImageIcon(scrollLeftImage));
 			scrollLeft.setToolTipText("scroll left");
 			scrollLeft.addActionListener(new ActionListener() {
@@ -729,7 +737,7 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollRight = new JButton();
-			URL scrollRightImage = getClass().getResource("pictures/rightarrow.png");
+			URL scrollRightImage = getClass().getResource("pictures/rightarrow.jpeg");
 			scrollRight.setIcon(new ImageIcon(scrollRightImage));
 			scrollRight.setToolTipText("scroll right");
 			scrollRight.addActionListener(new ActionListener() {
