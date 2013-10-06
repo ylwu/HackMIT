@@ -205,8 +205,7 @@ public class JPanelDemo extends JFrame {
 					// these 2 lines opens page 1 at 100% scaling
 					pdfDecoder.setPageParameters(1, 1); // values scaling // (1=100%). page number
 					pdfDecoder.invalidate();
-					System.out.println(pdfDecoder.getSize().height);
-			        System.out.println(pdfDecoder.getSize().width);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -219,6 +218,9 @@ public class JPanelDemo extends JFrame {
 				repaint();
 				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				System.out.println("hi");
+				System.out.println(pdfDecoder.getSize().height);
+                System.out.println(pdfDecoder.getSize().width);
 			}
 		}
 	}
