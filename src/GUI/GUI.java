@@ -153,6 +153,9 @@ public class GUI extends JFrame{
 	           if (hoverPointX !=0){
 	               drawPoint(hoverPointX,hoverPointY,g);
 	           }
+	           if (endPointX !=0){
+                   drawPoint(endPointX,endPointY,g);
+               }
 	        }
 	    }
 	    
@@ -365,8 +368,8 @@ public class GUI extends JFrame{
 		private JButton initMode() {
 
 			JButton mode = new JButton();
-			mode.setIcon(new ImageIcon(getClass().getResource(
-					"/org/jpedal/examples/viewer/res/open.gif"))); //$NON-NLS-1$
+			URL closelock = getClass().getResource("pictures/closedlock.jpeg");
+			mode.setIcon(new ImageIcon(closelock)); 
 			mode.setText("Zoom Disabled");
 			mode.setToolTipText("Mode of the reader");
 			mode.setBorderPainted(false);
@@ -752,14 +755,40 @@ public class GUI extends JFrame{
 			return list;
 		}
 		
-		public void extractSelectedScreenAsImage(int i,int k, int j, int m)
+		public void extractSelectedScreenAsImage(int a1,int b1, int a2, int b2)
 	      {
-	   
+	      
+		  int y1 = pdfDecoder.getPDFHeight()- b1;
+		  int y2 = pdfDecoder.getPDFHeight() -b2;
+		  int x1 = a1;
+		  int x2 = a2;
+		    System.out.println("extract");
+		    System.out.println(x1);
+		    System.out.println(x2);
+		    System.out.println(y1);
+		    System.out.println(y2);
+		    
+		    int i = x1;
+		    int j = x2;
+		    int k = y1;
+		    int m = y2;
+		    
+		    if (y1<y2){
+		        m=y1;
+		        k=y2;
+		    }
+		    
+		    if (x1>x2){
+		        j = x1;
+		        i = x2;
+		    }
+		    
 	    float f = 100.0F;
 	    final BufferedImage localBufferedImage = pdfDecoder.getSelectedRectangleOnscreen(i, k, j, m, f);
 	    File outputfile = new File("image.jpg");
 	    try {
 	        ImageIO.write(localBufferedImage, "jpg", outputfile);
+	        System.out.println("file saved");
 	    } catch (IOException e) {
 	        // TODO Auto-generated catch block
 	        e.printStackTrace();
@@ -964,25 +993,37 @@ public class GUI extends JFrame{
 		public void enable_mode(){
 			enable = true;
 			mode.setText("Zoom Enabled");
+			
+			URL openlock = getClass().getResource("pictures/openlock.jpeg");
+			mode.setIcon(new ImageIcon(openlock));
+			
 		}
 		public void disable_mode(){
 			enable = false;
 			mode.setText("Zoom Disabled");
+			
+			URL closelock = getClass().getResource("pictures/closedlock.jpeg");
+			mode.setIcon(new ImageIcon(closelock));
 		}
 		
 		public void hoverPoint(int xl, int yl){
+		    System.out.println("hover");
 		    hoverPointX = PageWidth/2 + xl;
 		    hoverPointY = PageHeight/2 - yl;
 		    repaint();
 		}
 		
 		public void startPoint(int xl, int yl){
+		    System.out.print("start");
+		    
             startPointX = PageWidth/2 + xl;
             startPointY = PageHeight/2 -yl;
             repaint();
         }
 		
 		public void endPoint(int xl, int yl){
+		    System.out.println("end");
+		    
 		    hoverPointX = 0;
             hoverPointY = 0;
             endPointX = PageWidth/2 + xl;
@@ -992,7 +1033,7 @@ public class GUI extends JFrame{
             
             float f = currentScale/100;
             extractSelectedScreenAsImage(Math.round(startPointX/f), Math.round(startPointY/f), Math.round(endPointX/f), Math.round(endPointY/f));
-		
+		     
             hoverPointX = 0;
             hoverPointY = 0;
             startPointX = 0;
@@ -1062,6 +1103,7 @@ public class GUI extends JFrame{
 				}
 				else if (coordinate[0].equals("enable")){
 					enable_mode();
+					
 				}
 				else if (coordinate[0].equals("disable")){
 					disable_mode();
