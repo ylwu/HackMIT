@@ -639,6 +639,7 @@ public class GUI extends JFrame{
 		        pdfDecoder.setDisplayView(1,1);
 		            currentScale = Integer.parseInt(scaling.getText().trim());
 		            int newScale = (int)(currentScale-(zoomF/2));
+		            if(newScale<1){newScale = 1;}
 		            float factor = (float) ((double)newScale/100);
 		            pdfDecoder.setPageParameters(factor, currentPage);
 		            pdfDecoder.invalidate();
