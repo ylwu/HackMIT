@@ -88,7 +88,7 @@ public class JPanelDemo extends JFrame {
 	private final JLabel pageCounter3 = new JLabel("of");// 000 used to set
 															// prefered // size
 	private JTextField scaling = new JTextField(4);
-	private final JLabel scaling2 = new JLabel("%");
+	private final JLabel scaling2 = new JLabel("%"); 
 
 	/**
 	 * construct a pdf viewer, passing in the full file name
@@ -237,7 +237,7 @@ public class JPanelDemo extends JFrame {
 		cPane.add(display, BorderLayout.CENTER);
 		pack();
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		setSize(screen.width/2, screen.height/2);
+		setSize(screen.width*2/3, screen.height*2/3);
 		setLocationRelativeTo(null);// centre on screen
 		setVisible(true);
 	}
@@ -280,7 +280,7 @@ public class JPanelDemo extends JFrame {
 	 */
 	private Component[] initChangerPanel() {
 
-		Component[] list = new Component[14];
+		Component[] list = new Component[19];
 
 		/** back to page 1 */
 		JButton start = new JButton();
@@ -555,7 +555,75 @@ public class JPanelDemo extends JFrame {
 		});
 
 		list[13] = scaling2;
-
+		
+		JButton scrollUp = new JButton();
+		scrollUp.setToolTipText("scroll up");
+		scrollUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pdfDecoder.setDisplayView(1, 1);
+				int position = display.getVerticalScrollBar().getValue();
+				if(position>100){
+					display.getVerticalScrollBar().setValue(position-100);
+				}else{
+					display.getVerticalScrollBar().setValue(0);
+				}
+			}
+		});
+		
+		JButton scrollDown = new JButton();
+		scrollDown.setToolTipText("scroll down");
+		scrollDown.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pdfDecoder.setDisplayView(1, 1);
+				int position = display.getVerticalScrollBar().getValue();
+				int possPosi = display.getVerticalScrollBar().getMaximum()-display.getVerticalScrollBar().getHeight();
+				if(possPosi-100>position){
+					display.getVerticalScrollBar().setValue(position+100);
+				}else{
+					display.getVerticalScrollBar().setValue(possPosi);
+				}
+			}
+		});
+		
+		JButton scrollLeft = new JButton();
+		scrollLeft.setToolTipText("scroll left");
+		scrollLeft.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pdfDecoder.setDisplayView(1, 1);
+				int position = display.getHorizontalScrollBar().getValue();
+				if(position>100){
+					display.getHorizontalScrollBar().setValue(position-100);
+				}else{
+					display.getHorizontalScrollBar().setValue(0);
+				}
+			}
+		});
+		
+		JButton scrollRight = new JButton();
+		scrollRight.setToolTipText("scroll right");
+		scrollRight.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pdfDecoder.setDisplayView(1, 1);
+				int position = display.getHorizontalScrollBar().getValue();
+				int possPosi = display.getHorizontalScrollBar().getMaximum()-display.getHorizontalScrollBar().getHeight();
+				if(possPosi-100>position){
+					display.getHorizontalScrollBar().setValue(position+100);
+				}else{
+					display.getHorizontalScrollBar().setValue(possPosi);
+				}
+			}
+		});
+		
+		list[14] = new JPanel();
+		list[15] = scrollUp;
+		list[16] = scrollDown;
+		list[17] = scrollLeft;
+		list[18] = scrollRight;
+		
 		return list;
 	}
 	
@@ -702,6 +770,48 @@ public class JPanelDemo extends JFrame {
 		}
 
 	}
+	
+	public void scrollUp(){
+		pdfDecoder.setDisplayView(1, 1);
+		int position = display.getVerticalScrollBar().getValue();
+		if(position>100){
+			display.getVerticalScrollBar().setValue(position-100);
+		}else{
+			display.getVerticalScrollBar().setValue(0);
+		}
+	}
+	
+	public void scrollDown(){
+		pdfDecoder.setDisplayView(1, 1);
+		int position = display.getVerticalScrollBar().getValue();
+		int possPosi = display.getVerticalScrollBar().getMaximum()-display.getVerticalScrollBar().getHeight();
+		if(possPosi-100>position){
+			display.getVerticalScrollBar().setValue(position+100);
+		}else{
+			display.getVerticalScrollBar().setValue(possPosi);
+		}
+	}
+	
+	public void scrollLeft(){
+		pdfDecoder.setDisplayView(1, 1);
+		int position = display.getHorizontalScrollBar().getValue();
+		if(position>100){
+			display.getHorizontalScrollBar().setValue(position-100);
+		}else{
+			display.getHorizontalScrollBar().setValue(0);
+		}
+	}
+	
+	public void scrollRight(){
+		pdfDecoder.setDisplayView(1, 1);
+		int position = display.getHorizontalScrollBar().getValue();
+		int possPosi = display.getHorizontalScrollBar().getMaximum()-display.getHorizontalScrollBar().getHeight();
+		if(possPosi-100>position){
+			display.getHorizontalScrollBar().setValue(position+100);
+		}else{
+			display.getHorizontalScrollBar().setValue(possPosi);
+		}
+	}
 
 	public class LeapMotion implements LeapEventListener {
 	    
@@ -757,6 +867,10 @@ public class JPanelDemo extends JFrame {
 			if (coordinate[0].equals("zoomOut")){
                 zoomOut(Float.parseFloat(coordinate[1]));
             }
+			
+			if (coordinate[0].equals("scroll")){
+				
+			}
 			        
 		}
 
