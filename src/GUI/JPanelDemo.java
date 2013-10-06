@@ -132,7 +132,6 @@ public class JPanelDemo extends JFrame {
 			if (resultOfFileSelect == JFileChooser.APPROVE_OPTION) {
 				currentFile = open.getSelectedFile().getAbsolutePath();
 				currentPage = 1;
-				int pageNumber = pdfDecoder.getPageCount();
 				try {
 					// close the current pdf before opening another
 					pdfDecoder.closePdfFile();
@@ -163,7 +162,7 @@ public class JPanelDemo extends JFrame {
 
 				// set page number display
 				pageCounter2.setText(String.valueOf(currentPage));
-				pageCounter3.setText("of " + pageNumber);
+				pageCounter3.setText("of " + pdfDecoder.getPageCount());
 				setTitle(viewerTitle + " - " + currentFile);
 				scaling.setText(String.valueOf(currentScale));
 				repaint();
