@@ -34,8 +34,9 @@ public class LeapInput {
     long maxZoomCooldown = 1200;
     long zoomInCooldown;
     long zoomOutCooldown;
-    long maxScrollCooldown = 1200;
-    long scrollCooldown;
+    long maxScrollCooldown = 1500;
+    long scrollUpCooldown;
+    long scrollDownCooldown;
     // Frequency of queue cleaning
     int decreaseFreq = 2;
     int decreaseQueue = 1;
@@ -43,7 +44,7 @@ public class LeapInput {
     // Allow zoom and drag when true
     boolean inOperation = false;
     float OPERATION_THRESHOLD = 30;
-    float SCROLL_THRESHOLD = 8;
+    float SCROLL_THRESHOLD = 9;
     float ZOOM_THRESHOLD = 8;
     LinkedList<Vector> lastHands;
     LinkedList<Vector> lastFingerA;
@@ -91,7 +92,8 @@ public class LeapInput {
         swipeCooldown = 0;
         zoomInCooldown = 0;
         zoomOutCooldown = 0;
-        scrollCooldown = 0;
+        scrollUpCooldown = 0;
+        scrollDownCooldown = 0;
         tempCount = 0;
         resetSelect();
     }
@@ -157,6 +159,10 @@ public class LeapInput {
                     lastFinger = thisTip;
                 }else{
                     lastFinger = thisTip;
+                }
+            }else if (fingers.count()==0){
+                if (isDrawing){
+                    selectCounter++;
                 }
             }
 
@@ -270,7 +276,8 @@ public class LeapInput {
                 inOperation = true;
                 zoomInCooldown = maxZoomCooldown;
                 zoomOutCooldown = maxZoomCooldown;
-                scrollCooldown = maxScrollCooldown;
+                scrollUpCooldown = maxScrollCooldown;
+                scrollDownCooldown = maxScrollCooldown;
                 swipeCooldown = maxSwipeCooldown;
             }
         }else if (thisHand.minus(lastHand).getZ()>(OPERATION_THRESHOLD) &&
@@ -280,7 +287,8 @@ public class LeapInput {
                 inOperation = false;
                 zoomInCooldown = maxZoomCooldown;
                 zoomOutCooldown = maxZoomCooldown;
-                scrollCooldown = maxScrollCooldown;
+                scrollUpCooldown = maxScrollCooldown;
+                scrollDownCooldown = maxScrollCooldown;
                 swipeCooldown = maxSwipeCooldown;
             }
         }
@@ -299,17 +307,17 @@ public class LeapInput {
         Float lastDis2 = fingerDis.get(fingerDis.size()-3);
         if (thisDis-lastDis>ZOOM_THRESHOLD &&
                 lastDis-lastDis2>ZOOM_THRESHOLD*0.3){
-            if (zoomOutCooldown<=0){
-                fireEvent("zoomOut,"+Float.toString(thisDis-lastDis));
-                zoomOutCooldown = maxZoomCooldown/3;
-                zoomInCooldown = maxZoomCooldown;
+            if (zoomInCooldown<=0){
+                fireEvent("zoomIn,"+Float.toString(thisDis-lastDis));
+                zoomInCooldown = maxZoomCooldown/3;
+                zoomOutCooldown = maxZoomCooldown;
             }
         }else if (thisDis-lastDis<-ZOOM_THRESHOLD &&
                 lastDis-lastDis2<-ZOOM_THRESHOLD*0.3){
-            if (zoomInCooldown<=0){
-                fireEvent("zoomIn,"+Float.toString(lastDis-thisDis));
-                zoomInCooldown = maxZoomCooldown/3;
-                zoomOutCooldown = maxZoomCooldown;
+            if (zoomOutCooldown<=0){
+                fireEvent("zoomOut,"+Float.toString(lastDis-thisDis));
+                zoomOutCooldown = maxZoomCooldown/3;
+                zoomInCooldown = maxZoomCooldown;
             }
         }
         
@@ -328,8 +336,14 @@ public class LeapInput {
         Vector thisMove = thisMid.minus(lastMid);
         Vector lastMove = lastMid.minus(lastMid2);
         Vector weightedMove = thisMove.plus(lastMove.times(0.3f)).divide(1.3f);
-        if (weightedMove.getX()*weightedMove.getX()+weightedMove.getY()*weightedMove.getY()>400 && scrollCooldown<=0){
-            fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+        if (weightedMove.getX()*weightedMove.getX()+weightedMove.getY()*weightedMove.getY()>SCROLL_THRESHOLD*SCROLL_THRESHOLD){
+            if (weightedMove.getY()>0 && scrollUpCooldown<=0){
+                fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+                scrollDownCooldown = maxScrollCooldown;
+            }else if (weightedMove.getY()<0 && scrollDownCooldown<=0){
+                fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+                scrollUpCooldown = maxScrollCooldown;
+            }
         }
     }
     
@@ -370,8 +384,11 @@ public class LeapInput {
         if (zoomOutCooldown>0){
             zoomOutCooldown-=interval;
         }
-        if (scrollCooldown>0){
-            scrollCooldown-=interval;
+        if (scrollUpCooldown>0){
+            scrollUpCooldown-=interval;
+        }
+        if (scrollDownCooldown>0){
+            scrollDownCooldown-=interval;
         }
         if (decreaseQueue%decreaseFreq==0){
             if (lastFingerA.size()>0){

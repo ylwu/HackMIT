@@ -98,6 +98,8 @@ public class JPanelDemo extends JFrame {
 															// prefered // size
 	private JTextField scaling = new JTextField(4);
 	private final JLabel scaling2 = new JLabel("%"); 
+	private boolean enable;
+	private JButton mode;
 
 	/**
 	 * construct a pdf viewer, passing in the full file name
@@ -240,6 +242,7 @@ public class JPanelDemo extends JFrame {
 		JPanel topBar = new JPanel();
 		topBar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		topBar.add(open);
+		topBar.add(mode);
 		// topBar.add(pageChanger);
 		for (Component anItemsToAdd : itemsToAdd) {
 			topBar.add(anItemsToAdd);
@@ -277,7 +280,18 @@ public class JPanelDemo extends JFrame {
 
 		return open;
 	}
+	private JButton initMode() {
 
+		JButton mode = new JButton();
+		mode.setIcon(new ImageIcon(getClass().getResource(
+				"/org/jpedal/examples/viewer/res/open.gif"))); //$NON-NLS-1$
+		mode.setText("Zoom Disabled");
+		mode.setToolTipText("Mode of the reader");
+		mode.setBorderPainted(false);
+		
+
+		return mode;
+	}
 	/**
 	 * returns the scrollpane with pdfDecoder set as the viewport
 	 */
@@ -872,6 +886,14 @@ public class JPanelDemo extends JFrame {
 			display.getHorizontalScrollBar().setValue(possPosi);
 		}
 	}
+	public void enable_mode(){
+		enable = true;
+		mode.setText("Zoom Enabled");
+	}
+	public void disable_mode(){
+		enable = false;
+		mode.setText("Zoom Disabled");
+	}
 
 	public class LeapMotion implements LeapEventListener {
 	    
@@ -920,21 +942,27 @@ public class JPanelDemo extends JFrame {
 				getLastPage();
 			}
 			
-			if (coordinate[0].equals("zoomIn")){
+			if (coordinate[0].equals("zoomIn") && enable ==true){
 			    zoomIn(Float.parseFloat(coordinate[1]));
 			}
 			
-			if (coordinate[0].equals("zoomOut")){
+			if (coordinate[0].equals("zoomOut") && enable ==true){
                 zoomOut(Float.parseFloat(coordinate[1]));
             }
 			
-			if (coordinate[0].equals("scroll")){
+			if (coordinate[0].equals("scroll") && enable ==true){
 				float speedX = Float.parseFloat(coordinate[1]);
 				float speedY = Float.parseFloat(coordinate[2]);
 				if(speedX>0){scrollRight(speedX);}
 				else{scrollLeft(Math.abs(speedX));}
 				if(speedY>0){scrollUp(speedY);}
 				else{scrollDown(Math.abs(speedY));}	
+			}
+			if (coordinate[0].equals("enable")){
+				enable_mode();
+			}
+			if (coordinate[0].equals("disable")){
+				disable_mode();
 			}
 			        
 		}
