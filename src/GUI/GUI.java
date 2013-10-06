@@ -10,7 +10,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import leap.LeapEvent;
 import leap.LeapEventListener;
@@ -22,8 +31,6 @@ import org.jpedal.exception.PdfException;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.objects.PdfImageData;
 import org.jpedal.objects.PdfPageData;
-
-import GUI.JPanelDemo.LeapMotion;
 
 public class GUI extends JFrame{
 	
@@ -117,6 +124,8 @@ public class GUI extends JFrame{
 			pageTexts = null;
 			JFileChooser open = new JFileChooser(".");
 			open.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			open.setFileView(new ImageFileView());
+			open.setAcceptAllFileFilterUsed(false);
 			String[] pdf = new String[] { "pdf" };
 			open.addChoosableFileFilter(new FileFilterer(pdf, "Pdf (*.pdf)"));
 			int resultOfFileSelect = JFileChooser.ERROR_OPTION;
