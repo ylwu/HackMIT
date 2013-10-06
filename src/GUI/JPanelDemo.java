@@ -26,15 +26,22 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EventObject;
 
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -50,10 +57,12 @@ import leap.LeapInput;
 
 import org.jpedal.PdfDecoder;
 import org.jpedal.examples.viewer.utils.FileFilterer;
+import org.jpedal.examples.viewer.utils.IconiseImage;
 import org.jpedal.exception.PdfException;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.objects.PdfImageData;
 import org.jpedal.objects.PdfPageData;
+
 
 /**
  * very simple example of a viewer
@@ -115,6 +124,9 @@ public class JPanelDemo extends JFrame {
 		// ensure non-embedded font map to sensible replacements
 		FontMappings.setFontReplacements();
 		initializeViewer();
+		LeapInput leap = new LeapInput();
+        leap.start();
+        leap.addEventListener(new LeapMotion());
 	}
 
 	/**
@@ -632,6 +644,21 @@ public class JPanelDemo extends JFrame {
 		list[18] = scrollRight;
 		
 		return list;
+	}
+	
+	
+	public void extractSelectedScreenAsImage(int i,int k, int j, int m)
+	  {
+   
+    float f = 100.0F;
+    final BufferedImage localBufferedImage = pdfDecoder.getSelectedRectangleOnscreen(i, k, j, m, f);
+    File outputfile = new File("image.jpg");
+    try {
+        ImageIO.write(localBufferedImage, "jpg", outputfile);
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }  
 	}
 	
 	public void zoomIn(float zoomF){
