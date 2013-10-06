@@ -5,9 +5,11 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -576,6 +578,8 @@ public class GUI extends JFrame{
 			list[13] = scaling2;
 			
 			JButton scrollUp = new JButton();
+			URL scrollUpImage = getClass().getResource("/pictures/uparrow.jpeg");
+			scrollUp.setIcon(new ImageIcon(scrollUpImage));
 			scrollUp.setToolTipText("scroll up");
 			scrollUp.addActionListener(new ActionListener() {
 				@Override
@@ -591,6 +595,8 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollDown = new JButton();
+			URL scrollDownImage = getClass().getResource("/pictures/downarrow.jpeg");
+			scrollDown.setIcon(new ImageIcon(scrollDownImage));
 			scrollDown.setToolTipText("scroll down");
 			scrollDown.addActionListener(new ActionListener() {
 				@Override
@@ -607,6 +613,8 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollLeft = new JButton();
+			URL scrollLeftImage = getClass().getResource("/pictures/leftarrow.jpeg");
+			scrollLeft.setIcon(new ImageIcon(scrollLeftImage));
 			scrollLeft.setToolTipText("scroll left");
 			scrollLeft.addActionListener(new ActionListener() {
 				@Override
@@ -622,6 +630,8 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollRight = new JButton();
+			URL scrollRightImage = getClass().getResource("/pictures/rightarrow.jpeg");
+			scrollRight.setIcon(new ImageIcon(scrollRightImage));
 			scrollRight.setToolTipText("scroll right");
 			scrollRight.addActionListener(new ActionListener() {
 				@Override

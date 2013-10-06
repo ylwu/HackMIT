@@ -21,12 +21,17 @@ package GUI;
  * ---------------
  */
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -97,15 +102,39 @@ public class JPanelDemo extends JFrame {
 	private final JLabel pageCounter3 = new JLabel("of");// 000 used to set
 															// prefered // size
 	private JTextField scaling = new JTextField(4);
-	private final JLabel scaling2 = new JLabel("%"); 
+	private final JLabel scaling2 = new JLabel("%");
+	private static final Stroke LINE_STROKE = new BasicStroke(10);
+	private static final int PageHeight = 538;
+	private static final int PageWidth = 956;
+	
+	public class Page extends PdfDecoder{
+	    
+	    
+	    public Page(boolean b){
+	        super(b);
+	    }
+	    
+	    @Override
+        public void paintComponent(Graphics g) {
+	       super.paintComponent(g);
+	       Graphics2D g2 = (Graphics2D) g;
+	       g2.setStroke(LINE_STROKE);
+	       g2.setColor(Color.red);
+	       g2.drawLine(PageWidth/2,PageHeight/2,PageWidth/2,PageHeight/2);
+	    }
+	}
 	private boolean enable;
 	private JButton mode;
+
 
 	/**
 	 * construct a pdf viewer, passing in the full file name
 	 */
 	public JPanelDemo(String name) {
-		pdfDecoder = new PdfDecoder(true);
+		pdfDecoder = new Page(true);
+		mode = initMode();
+		System.out.println(pdfDecoder.getSize().height);
+		System.out.println(pdfDecoder.getSize().width);
 		// ensure non-embedded font map to sensible replacements
 		FontMappings.setFontReplacements();
 		currentFile = name;// store file name for use in page changer
@@ -122,10 +151,13 @@ public class JPanelDemo extends JFrame {
 	 */
 	public JPanelDemo() {
 		setTitle(viewerTitle);
-		pdfDecoder = new PdfDecoder(true);
+		mode = initMode();
+		pdfDecoder = new Page(true);
 		// ensure non-embedded font map to sensible replacements
 		FontMappings.setFontReplacements();
 		initializeViewer();
+		System.out.println(pdfDecoder.getSize().height);
+        System.out.println(pdfDecoder.getSize().width);
 		LeapInput leap = new LeapInput();
         leap.start();
         leap.addEventListener(new LeapMotion());
@@ -173,6 +205,8 @@ public class JPanelDemo extends JFrame {
 					// these 2 lines opens page 1 at 100% scaling
 					pdfDecoder.setPageParameters(1, 1); // values scaling // (1=100%). page number
 					pdfDecoder.invalidate();
+					System.out.println(pdfDecoder.getSize().height);
+			        System.out.println(pdfDecoder.getSize().width);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -886,6 +920,10 @@ public class JPanelDemo extends JFrame {
 			display.getHorizontalScrollBar().setValue(possPosi);
 		}
 	}
+	
+	public void hoverRedDot(int x, int y){
+	
+	}
 	public void enable_mode(){
 		enable = true;
 		mode.setText("Zoom Enabled");
@@ -908,6 +946,10 @@ public class JPanelDemo extends JFrame {
 			String command = e.message;
 			System.out.println(command);
 			String[] coordinate = command.split(",");
+			
+			if (coordinate[0].equals("hover")){
+			   // hoverRedDot(coordinate[1],coordinate[2]);
+			}
 
 			// forward 1 page
 			if (coordinate[0] .equals("swipe")
@@ -970,12 +1012,12 @@ public class JPanelDemo extends JFrame {
 	}
 
 	/** create a standalone program. User may pass in name of file as option */
-/*	public static void main(String[] args) {
-		*//** Run the software *//*
+	public static void main(String[] args) {
+		//** Run the software *//
 		if (args.length > 0) {
 			new JPanelDemo(args[0]);
 		} else {
 			new JPanelDemo();
 		}
-	}*/
+	}
 }
