@@ -578,7 +578,7 @@ public class GUI extends JFrame{
 			list[13] = scaling2;
 			
 			JButton scrollUp = new JButton();
-			URL scrollUpImage = getClass().getResource("/pictures/uparrow.jpeg");
+			URL scrollUpImage = getClass().getResource("pictures/uparrow.jpeg");
 			scrollUp.setIcon(new ImageIcon(scrollUpImage));
 			scrollUp.setToolTipText("scroll up");
 			scrollUp.addActionListener(new ActionListener() {
@@ -595,7 +595,7 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollDown = new JButton();
-			URL scrollDownImage = getClass().getResource("/pictures/downarrow.jpeg");
+			URL scrollDownImage = getClass().getResource("pictures/downarrow.jpeg");
 			scrollDown.setIcon(new ImageIcon(scrollDownImage));
 			scrollDown.setToolTipText("scroll down");
 			scrollDown.addActionListener(new ActionListener() {
@@ -613,7 +613,7 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollLeft = new JButton();
-			URL scrollLeftImage = getClass().getResource("/pictures/leftarrow.jpeg");
+			URL scrollLeftImage = getClass().getResource("pictures/leftarrow.jpeg");
 			scrollLeft.setIcon(new ImageIcon(scrollLeftImage));
 			scrollLeft.setToolTipText("scroll left");
 			scrollLeft.addActionListener(new ActionListener() {
@@ -630,7 +630,7 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollRight = new JButton();
-			URL scrollRightImage = getClass().getResource("/pictures/rightarrow.jpeg");
+			URL scrollRightImage = getClass().getResource("pictures/rightarrow.jpeg");
 			scrollRight.setIcon(new ImageIcon(scrollRightImage));
 			scrollRight.setToolTipText("scroll right");
 			scrollRight.addActionListener(new ActionListener() {

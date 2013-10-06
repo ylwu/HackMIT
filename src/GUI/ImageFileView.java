@@ -36,8 +36,8 @@ import javax.swing.*;
 import javax.swing.filechooser.*;
 
 public class ImageFileView extends FileView {
-    ImageIcon pdfIcon = Utils.createImageIcon("/pictures/pdf.png");
-    ImageIcon folderIcon = Utils.createImageIcon("/pictures/folder.png");
+    ImageIcon pdfIcon = Utils.createImageIcon("pictures/pdf.png");
+    ImageIcon folderIcon = Utils.createImageIcon("pictures/folder.png");
     public ImageIcon getFolderIcon() {
         return folderIcon;
     }
