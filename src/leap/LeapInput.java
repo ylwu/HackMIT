@@ -31,10 +31,10 @@ public class LeapInput {
     long maxSwipeCooldown = 1000;
     long swipeCooldown;
     // Cooldown set to keep zoom from bouncing back due to finger relaxing
-    long maxZoomCooldown = 1000;
+    long maxZoomCooldown = 1200;
     long zoomInCooldown;
     long zoomOutCooldown;
-    long maxScrollCooldown = 500;
+    long maxScrollCooldown = 1200;
     long scrollCooldown;
     // Frequency of queue cleaning
     int decreaseFreq = 2;
@@ -43,8 +43,8 @@ public class LeapInput {
     // Allow zoom and drag when true
     boolean inOperation = false;
     float OPERATION_THRESHOLD = 30;
-    float SCROLL_THRESHOLD = 10;
-    float ZOOM_THRESHOLD = 10;
+    float SCROLL_THRESHOLD = 8;
+    float ZOOM_THRESHOLD = 8;
     LinkedList<Vector> lastHands;
     LinkedList<Vector> lastFingerA;
     LinkedList<Vector> lastFingerB;
@@ -56,7 +56,7 @@ public class LeapInput {
     Vector lastFinger;
     int selectCounter;
     int SELECT_HOLD_RANGE = 8;
-    int MAX_SELECT_COUNTER = 15;
+    int MAX_SELECT_COUNTER = 12;
     float xMin = -250;
     float curXMin;
     float xMax = 250;
@@ -176,7 +176,7 @@ public class LeapInput {
     }
     
     public void processGestures(){
-        if (isDrawing) return;
+        //if (isDrawing) return;
         GestureList gestures = lastFrame.isValid()?
                 frame.gestures(lastFrame) :
                 frame.gestures();
@@ -215,7 +215,6 @@ public class LeapInput {
         //System.out.println(totEnd.toString());
         Vector result = (totEnd.minus(totStart)).divide(vSize);
         fireEvent("swipe,"+Float.toString(result.getX())+","+Float.toString(result.getY()));
-        System.out.println(result.toString());
     }
     
     
@@ -266,6 +265,7 @@ public class LeapInput {
         if (thisHand.minus(lastHand).getZ()<(-OPERATION_THRESHOLD) &&
                 lastHand.minus(lastHand2).getZ()<(-0.5*OPERATION_THRESHOLD)){
             if (!inOperation) {
+                fireEvent("enable");
                 System.out.println("Operation true");
                 inOperation = true;
                 zoomInCooldown = maxZoomCooldown;
@@ -276,7 +276,7 @@ public class LeapInput {
         }else if (thisHand.minus(lastHand).getZ()>(OPERATION_THRESHOLD) &&
                 lastHand.minus(lastHand2).getZ()>(0.5*OPERATION_THRESHOLD)){
             if (inOperation){
-                System.out.println("Operation false");
+                fireEvent("disable");
                 inOperation = false;
                 zoomInCooldown = maxZoomCooldown;
                 zoomOutCooldown = maxZoomCooldown;
@@ -301,14 +301,14 @@ public class LeapInput {
                 lastDis-lastDis2>ZOOM_THRESHOLD*0.3){
             if (zoomOutCooldown<=0){
                 fireEvent("zoomOut,"+Float.toString(thisDis-lastDis));
-                zoomOutCooldown = maxZoomCooldown/2;
+                zoomOutCooldown = maxZoomCooldown/3;
                 zoomInCooldown = maxZoomCooldown;
             }
         }else if (thisDis-lastDis<-ZOOM_THRESHOLD &&
                 lastDis-lastDis2<-ZOOM_THRESHOLD*0.3){
             if (zoomInCooldown<=0){
                 fireEvent("zoomIn,"+Float.toString(lastDis-thisDis));
-                zoomInCooldown = maxZoomCooldown/2;
+                zoomInCooldown = maxZoomCooldown/3;
                 zoomOutCooldown = maxZoomCooldown;
             }
         }

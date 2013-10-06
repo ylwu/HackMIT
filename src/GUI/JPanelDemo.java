@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.EventObject;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.JAI;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -233,10 +232,6 @@ public class JPanelDemo extends JFrame {
 
 		cPane = getContentPane();
 		cPane.setLayout(new BorderLayout());
-		
-		LeapInput leap = new LeapInput();
-        leap.start();
-        leap.addEventListener(new LeapMotion());
 		
 		JButton open = initOpenBut();// setup open button
 		Component[] itemsToAdd = initChangerPanel();// setup page display and
