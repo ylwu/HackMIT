@@ -58,6 +58,7 @@ import leap.LeapInput;
 
 import org.jpedal.PdfDecoder;
 import org.jpedal.examples.viewer.utils.FileFilterer;
+import org.jpedal.examples.viewer.utils.IconiseImage;
 import org.jpedal.exception.PdfException;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.objects.PdfImageData;
@@ -647,115 +648,15 @@ public class JPanelDemo extends JFrame {
 	  {
    
     float f = 100.0F;
-    if (PdfDecoder.isRunningOnWindows)
-      f = 100.0F * this.currentGUI.getScaling();
-    final BufferedImage localBufferedImage = this.decode_pdf.getSelectedRectangleOnscreen(i, k, j, m, f);
-    JPanel localJPanel1 = new JPanel();
-    localJPanel1.setLayout(new BorderLayout());
-    if (localBufferedImage != null)
-    {
-      localObject = new IconiseImage(localBufferedImage);
-      localJPanel1.add(new JLabel((Icon)localObject), "Center");
-    }
-    else
-    {
-      return;
-    }
-    Object localObject = new JScrollPane();
-    ((JScrollPane)localObject).getViewport().add(localJPanel1);
-    int n = localBufferedImage.getWidth();
-    if (n < localBufferedImage.getHeight())
-      n = localBufferedImage.getHeight();
-    n += 50;
-    if (n > 450)
-      n = 450;
-    Container localContainer = this.currentGUI.getFrame();
-    final JDialog localJDialog = new JDialog((JFrame)null, true);
-    if (this.commonValues.getModeOfOperation() != 1)
-    {
-      localJDialog.setLocationRelativeTo(null);
-      localJDialog.setLocation(localContainer.getLocationOnScreen().x + 10, localContainer.getLocationOnScreen().y + 10);
-    }
-    localJDialog.setSize(n, n);
-    localJDialog.setTitle(Messages.getMessage("PdfViewerMessage.SaveImage"));
-    localJDialog.getContentPane().setLayout(new BorderLayout());
-    localJDialog.getContentPane().add((Component)localObject, "Center");
-    JPanel localJPanel2 = new JPanel();
-    localJPanel2.setLayout(new BorderLayout());
-    localJDialog.getContentPane().add(localJPanel2, "South");
-    JButton localJButton1 = new JButton(Messages.getMessage("PdfMessage.Yes"));
-    localJButton1.setFont(new Font("SansSerif", 0, 12));
-    localJPanel2.add(localJButton1, "West");
-    localJButton1.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent paramAnonymousActionEvent)
-      {
-        localJDialog.setVisible(false);
-        int i = 0;
-        while (i == 0)
-        {
-          JFileChooser localJFileChooser = new JFileChooser(System.getProperty("user.dir"));
-          localJFileChooser.addChoosableFileFilter(new FileFilterer(new String[] { "tif", "tiff" }, "TIFF"));
-          localJFileChooser.addChoosableFileFilter(new FileFilterer(new String[] { "jpg", "jpeg" }, "JPEG"));
-          int j = localJFileChooser.showSaveDialog(this.val$image_scroll);
-          if (j == 0)
-          {
-            File localFile = localJFileChooser.getSelectedFile();
-            String str1 = localFile.getAbsolutePath();
-            String str2 = localJFileChooser.getFileFilter().getDescription();
-            if (str2.equals("All Files"))
-              str2 = "TIFF";
-            if (!str1.toLowerCase().endsWith(('.' + str2).toLowerCase()))
-            {
-              str1 = str1 + '.' + str2;
-              localFile = new File(str1);
-            }
-            if (localFile.exists())
-            {
-              int k = Commands.this.currentGUI.showConfirmDialog(str1 + '\n' + Messages.getMessage("PdfViewerMessage.FileAlreadyExists") + ".\n" + Messages.getMessage("PdfViewerMessage.ConfirmResave"), Messages.getMessage("PdfViewerMessage.Resave"), 0);
-              if (k == 1);
-            }
-            else
-            {
-              if (JAIHelper.isJAIused())
-                JAIHelper.confirmJAIOnClasspath();
-              if (localBufferedImage != null)
-                if (JAIHelper.isJAIused())
-                  JAI.create("filestore", localBufferedImage, str1, str2);
-                else if (str2.toLowerCase().startsWith("tif"))
-                  Commands.this.currentGUI.showMessageDialog("Please setup JAI library for Tiffs");
-                else
-                  try
-                  {
-                    ImageIO.write(localBufferedImage, str2, new File(str1));
-                  }
-                  catch (IOException localIOException)
-                  {
-                    localIOException.printStackTrace();
-                  }
-              i = 1;
-            }
-          }
-          else
-          {
-            return;
-          }
-        }
-        localJDialog.dispose();
-      }
-    });
-    JButton localJButton2 = new JButton(Messages.getMessage("PdfMessage.No"));
-    localJButton2.setFont(new Font("SansSerif", 0, 12));
-    localJPanel2.add(localJButton2, "East");
-    localJButton2.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent paramAnonymousActionEvent)
-      {
-        localJDialog.dispose();
-      }
-    });
-    localJDialog.setVisible(true);
-	  }
+    final BufferedImage localBufferedImage = pdfDecoder.getSelectedRectangleOnscreen(i, k, j, m, f);
+    File outputfile = new File("image.jpg");
+    try {
+        ImageIO.write(localBufferedImage, "jpg", outputfile);
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }  
+	}
 	
 	public void zoomIn(float zoomF){
 	    pdfDecoder.setDisplayView(1,1);
