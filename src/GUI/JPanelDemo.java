@@ -21,12 +21,17 @@ package GUI;
  * ---------------
  */
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -98,13 +103,33 @@ public class JPanelDemo extends JFrame {
 	private final JLabel pageCounter3 = new JLabel("of");// 000 used to set
 															// prefered // size
 	private JTextField scaling = new JTextField(4);
-	private final JLabel scaling2 = new JLabel("%"); 
+	private final JLabel scaling2 = new JLabel("%");
+	private static final Stroke LINE_STROKE = new BasicStroke(3f);
+	
+	public class Page extends PdfDecoder{
+	    
+	    
+	    public Page(boolean b){
+	        super(b);
+	    }
+	    
+	    @Override
+        public void paintComponent(Graphics g) {
+	       super.paintComponent(g);
+	       Graphics2D g2 = (Graphics2D) g;
+	       g2.setStroke(LINE_STROKE);
+	       g2.setColor(Color.red);
+	       g2.drawLine(0, 50, getWidth(), 50);
+	    }
+	}
 
 	/**
 	 * construct a pdf viewer, passing in the full file name
 	 */
 	public JPanelDemo(String name) {
-		pdfDecoder = new PdfDecoder(true);
+		pdfDecoder = new Page(true);
+		System.out.println(pdfDecoder.getSize().height);
+		System.out.println(pdfDecoder.getSize().width);
 		// ensure non-embedded font map to sensible replacements
 		FontMappings.setFontReplacements();
 		currentFile = name;// store file name for use in page changer
@@ -121,10 +146,12 @@ public class JPanelDemo extends JFrame {
 	 */
 	public JPanelDemo() {
 		setTitle(viewerTitle);
-		pdfDecoder = new PdfDecoder(true);
+		pdfDecoder = new Page(true);
 		// ensure non-embedded font map to sensible replacements
 		FontMappings.setFontReplacements();
 		initializeViewer();
+		System.out.println(pdfDecoder.getSize().height);
+        System.out.println(pdfDecoder.getSize().width);
 		LeapInput leap = new LeapInput();
         leap.start();
         leap.addEventListener(new LeapMotion());
@@ -851,6 +878,10 @@ public class JPanelDemo extends JFrame {
 			display.getHorizontalScrollBar().setValue(possPosi);
 		}
 	}
+	
+	public void hoverRedDot(int x, int y){
+	    
+	}
 
 	public class LeapMotion implements LeapEventListener {
 	    
@@ -865,6 +896,10 @@ public class JPanelDemo extends JFrame {
 			String command = e.message;
 			System.out.println(command);
 			String[] coordinate = command.split(",");
+			
+			if (coordinate[0].equals("hover")){
+			   // hoverRedDot(coordinate[1],coordinate[2]);
+			}
 
 			// forward 1 page
 			if (coordinate[0] .equals("swipe")
