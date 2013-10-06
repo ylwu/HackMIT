@@ -134,7 +134,6 @@ public class GUI extends JFrame{
 							// different file
 							resultOfFileSelect = JFileChooser.CANCEL_OPTION;
 						}
-
 						// these 2 lines opens page 1 at 100% scaling
 	/*					pageImages = new PdfImageData[pageNumber];
 						pageTexts = new PdfPageData[pageNumber];
@@ -150,7 +149,6 @@ public class GUI extends JFrame{
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-
 					// set page number display
 					pageCounter2.setText(String.valueOf(currentPage));
 					pageCounter3.setText("of " + pdfDecoder.getPageCount());
@@ -168,10 +166,8 @@ public class GUI extends JFrame{
 		 * accessable
 		 */
 		private boolean checkEncryption() {
-
 			// check if file is encrypted
 			if (pdfDecoder.isEncrypted()) {
-
 				// if file has a null password it will have been decoded and
 				// isFileViewable will return true
 				while (!pdfDecoder.isFileViewable()) {
@@ -190,7 +186,6 @@ public class GUI extends JFrame{
 													// | File Templates.
 						}
 						// pdfDecoder.verifyAccess();
-
 					}
 				}
 				return true;
@@ -241,7 +236,6 @@ public class GUI extends JFrame{
 		 * returns the open button with listener
 		 */
 		private JButton initOpenBut() {
-
 			JButton open = new JButton();
 			open.setIcon(new ImageIcon(getClass().getResource(
 					"/org/jpedal/examples/viewer/res/open.gif"))); //$NON-NLS-1$
@@ -254,7 +248,6 @@ public class GUI extends JFrame{
 					selectFile();
 				}
 			});
-
 			return open;
 		}
 
@@ -263,10 +256,8 @@ public class GUI extends JFrame{
 		 */
 		private void initPDFDisplay() {
 			display = new JScrollPane();
-			display
-					.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			display
-					.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			display.setViewportView(pdfDecoder);
 		}
 
@@ -298,6 +289,8 @@ public class GUI extends JFrame{
 							repaint();
 							display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 							display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+							display.getVerticalScrollBar().setValue(0);
+							display.getHorizontalScrollBar().setValue(0);
 						} catch (Exception e1) {
 							System.err.println("back to page 1");
 							e1.printStackTrace();
@@ -329,6 +322,8 @@ public class GUI extends JFrame{
 							repaint();
 							display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 							display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+							display.getVerticalScrollBar().setValue(0);
+							display.getHorizontalScrollBar().setValue(0);
 						} catch (Exception e1) {
 							System.err.println("back 10 pages");
 							e1.printStackTrace();
@@ -360,6 +355,8 @@ public class GUI extends JFrame{
 							repaint();
 							display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 							display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+							display.getVerticalScrollBar().setValue(0);
+							display.getHorizontalScrollBar().setValue(0);
 						} catch (Exception e1) {
 							System.err.println("back 1 page");
 							e1.printStackTrace();
@@ -369,16 +366,13 @@ public class GUI extends JFrame{
 					}
 				}
 			});
-
 			pageCounter2.setEditable(true);
 			pageCounter2.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent a) {
-
 					String value = pageCounter2.getText().trim();
 					int newPage;
-
 					// allow for bum values
 					try {
 						pdfDecoder.setDisplayView(1, 1);
@@ -393,6 +387,8 @@ public class GUI extends JFrame{
 							repaint();
 							display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 							display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+							display.getVerticalScrollBar().setValue(0);
+							display.getHorizontalScrollBar().setValue(0);
 						} catch (Exception e) {
 							System.err.println("page number entered");
 							e.printStackTrace();
@@ -406,9 +402,7 @@ public class GUI extends JFrame{
 												+ "< is Not a valid Value.\nPlease enter a number between 1 and "
 												+ pdfDecoder.getPageCount());
 					}
-
 				}
-
 			});
 
 			/** put page count in middle of forward and back */
@@ -445,6 +439,8 @@ public class GUI extends JFrame{
 							repaint();
 							display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 							display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+							display.getVerticalScrollBar().setValue(0);
+							display.getHorizontalScrollBar().setValue(0);
 						} catch (Exception e1) {
 							System.err.println("forward 1 page");
 							e1.printStackTrace();
@@ -477,11 +473,12 @@ public class GUI extends JFrame{
 							repaint();
 							display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 							display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+							display.getVerticalScrollBar().setValue(0);
+							display.getHorizontalScrollBar().setValue(0);
 						} catch (Exception e1) {
 							System.err.println("forward 10 pages");
 							e1.printStackTrace();
 						}
-
 						// set page number display
 						pageCounter2.setText(String.valueOf(currentPage));
 					}
@@ -512,12 +509,13 @@ public class GUI extends JFrame{
 							System.err.println("forward to last page");
 							e1.printStackTrace();
 						}
-
 						// set page number display
 						pageCounter2.setText(String.valueOf(currentPage));
 						repaint();
 						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+						display.getVerticalScrollBar().setValue(0);
+						display.getHorizontalScrollBar().setValue(0);
 					}
 				}
 			});
@@ -659,11 +657,12 @@ public class GUI extends JFrame{
 					repaint();
 					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					display.getVerticalScrollBar().setValue(0);
+					display.getHorizontalScrollBar().setValue(0);
 				} catch (Exception e1) {
 					System.err.println("forward 1 page");
 					e1.printStackTrace();
 				}
-
 				// set page number display
 				pageCounter2.setText(String.valueOf(currentPage));
 			}
@@ -678,15 +677,15 @@ public class GUI extends JFrame{
 					repaint();
 					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					display.getVerticalScrollBar().setValue(0);
+					display.getHorizontalScrollBar().setValue(0);
 				} catch (Exception e1) {
 					System.err.println("back 1 page");
 					e1.printStackTrace();
 				}
-
 				// set page number display
 				pageCounter2.setText(String.valueOf(currentPage));
 			}
-
 		}
 
 		public void getFirstPage() {
@@ -698,15 +697,15 @@ public class GUI extends JFrame{
 					repaint();
 					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					display.getVerticalScrollBar().setValue(0);
+					display.getHorizontalScrollBar().setValue(0);
 				} catch (Exception e1) {
 					System.err.println("back to page 1");
 					e1.printStackTrace();
 				}
-
 				// set page number display
 				pageCounter2.setText(String.valueOf(currentPage));
 			}
-
 		}
 
 		public void fastbackward() {
@@ -718,11 +717,12 @@ public class GUI extends JFrame{
 					repaint();
 					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					display.getVerticalScrollBar().setValue(0);
+					display.getHorizontalScrollBar().setValue(0);
 				} catch (Exception e1) {
 					System.err.println("back 10 pages");
 					e1.printStackTrace();
 				}
-
 				// set page number display
 				pageCounter2.setText(String.valueOf(currentPage));
 			}
@@ -737,11 +737,12 @@ public class GUI extends JFrame{
 					repaint();
 					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					display.getVerticalScrollBar().setValue(0);
+					display.getHorizontalScrollBar().setValue(0);
 				} catch (Exception e1) {
 					System.err.println("forward 10 pages");
 					e1.printStackTrace();
 				}
-
 				// set page number display
 				pageCounter2.setText(String.valueOf(currentPage));
 			}
@@ -756,6 +757,8 @@ public class GUI extends JFrame{
 					repaint();
 					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					display.getVerticalScrollBar().setValue(0);
+					display.getHorizontalScrollBar().setValue(0);
 				} catch (Exception e1) {
 					System.err.println("forward to last page");
 					e1.printStackTrace();
@@ -816,17 +819,13 @@ public class GUI extends JFrame{
 		public class LeapMotion implements LeapEventListener {
 		    
 		    public LeapMotion(){
-		        
 		    }
 
 		    public void handleLeapEvent(LeapEvent e) {
-	            
-		        System.out.println("getEvent");
-		        
+		        System.out.println("getEvent"); 
 				String command = e.message;
 				System.out.println(command);
 				String[] coordinate = command.split(",");
-
 				// forward 1 page
 				if (coordinate[0] .equals("swipe")
 						&& Float.parseFloat(coordinate[1]) > 100) {
@@ -852,22 +851,18 @@ public class GUI extends JFrame{
 				if (coordinate[0].equals("fast")
 						&& Float.parseFloat(coordinate[0]) > 100) {
 					fastforward();
-
 				}
 				// fast forward to last page
 				if (coordinate[0].equals("jump")
 						&& Float.parseFloat(coordinate[0]) > 100) {
 					getLastPage();
 				}
-				
 				if (coordinate[0].equals("zoomIn")){
 				    zoomIn(Float.parseFloat(coordinate[1]));
 				}
-				
 				if (coordinate[0].equals("zoomOut")){
 	                zoomOut(Float.parseFloat(coordinate[1]));
 	            }
-				
 				if (coordinate[0].equals("scroll")){
 					float speedX = Float.parseFloat(coordinate[1]);
 					float speedY = Float.parseFloat(coordinate[2]);

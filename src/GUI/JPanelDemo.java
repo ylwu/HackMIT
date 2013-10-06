@@ -318,6 +318,8 @@ public class JPanelDemo extends JFrame {
 						repaint();
 						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+						display.getVerticalScrollBar().setValue(0);
+						display.getHorizontalScrollBar().setValue(0);
 					} catch (Exception e1) {
 						System.err.println("back to page 1");
 						e1.printStackTrace();
@@ -349,6 +351,8 @@ public class JPanelDemo extends JFrame {
 						repaint();
 						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+						display.getVerticalScrollBar().setValue(0);
+						display.getHorizontalScrollBar().setValue(0);
 					} catch (Exception e1) {
 						System.err.println("back 10 pages");
 						e1.printStackTrace();
@@ -380,6 +384,8 @@ public class JPanelDemo extends JFrame {
 						repaint();
 						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+						display.getVerticalScrollBar().setValue(0);
+						display.getHorizontalScrollBar().setValue(0);
 					} catch (Exception e1) {
 						System.err.println("back 1 page");
 						e1.printStackTrace();
@@ -413,6 +419,8 @@ public class JPanelDemo extends JFrame {
 						repaint();
 						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+						display.getVerticalScrollBar().setValue(0);
+						display.getHorizontalScrollBar().setValue(0);
 					} catch (Exception e) {
 						System.err.println("page number entered");
 						e.printStackTrace();
@@ -465,6 +473,8 @@ public class JPanelDemo extends JFrame {
 						repaint();
 						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+						display.getVerticalScrollBar().setValue(0);
+						display.getHorizontalScrollBar().setValue(0);
 					} catch (Exception e1) {
 						System.err.println("forward 1 page");
 						e1.printStackTrace();
@@ -497,6 +507,8 @@ public class JPanelDemo extends JFrame {
 						repaint();
 						display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 						display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+						display.getVerticalScrollBar().setValue(0);
+						display.getHorizontalScrollBar().setValue(0);
 					} catch (Exception e1) {
 						System.err.println("forward 10 pages");
 						e1.printStackTrace();
@@ -538,6 +550,8 @@ public class JPanelDemo extends JFrame {
 					repaint();
 					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					display.getVerticalScrollBar().setValue(0);
+					display.getHorizontalScrollBar().setValue(0);
 				}
 			}
 		});
@@ -693,6 +707,8 @@ public class JPanelDemo extends JFrame {
 				repaint();
 				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				display.getVerticalScrollBar().setValue(0);
+				display.getHorizontalScrollBar().setValue(0);
 			} catch (Exception e1) {
 				System.err.println("forward 1 page");
 				e1.printStackTrace();
@@ -712,6 +728,8 @@ public class JPanelDemo extends JFrame {
 				repaint();
 				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				display.getVerticalScrollBar().setValue(0);
+				display.getHorizontalScrollBar().setValue(0);
 			} catch (Exception e1) {
 				System.err.println("back 1 page");
 				e1.printStackTrace();
@@ -732,6 +750,8 @@ public class JPanelDemo extends JFrame {
 				repaint();
 				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				display.getVerticalScrollBar().setValue(0);
+				display.getHorizontalScrollBar().setValue(0);
 			} catch (Exception e1) {
 				System.err.println("back to page 1");
 				e1.printStackTrace();
@@ -752,6 +772,8 @@ public class JPanelDemo extends JFrame {
 				repaint();
 				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				display.getVerticalScrollBar().setValue(0);
+				display.getHorizontalScrollBar().setValue(0);
 			} catch (Exception e1) {
 				System.err.println("back 10 pages");
 				e1.printStackTrace();
@@ -771,6 +793,8 @@ public class JPanelDemo extends JFrame {
 				repaint();
 				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				display.getVerticalScrollBar().setValue(0);
+				display.getHorizontalScrollBar().setValue(0);
 			} catch (Exception e1) {
 				System.err.println("forward 10 pages");
 				e1.printStackTrace();
@@ -790,6 +814,8 @@ public class JPanelDemo extends JFrame {
 				repaint();
 				display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				display.getVerticalScrollBar().setValue(0);
+				display.getHorizontalScrollBar().setValue(0);
 			} catch (Exception e1) {
 				System.err.println("forward to last page");
 				e1.printStackTrace();
