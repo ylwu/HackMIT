@@ -1016,16 +1016,16 @@ public class GUI extends JFrame{
 		
 		public void hoverPoint(int xl, int yl){
 		    System.out.println("hover");
-		    hoverPointX = PageWidth/2 + xl;
-		    hoverPointY = PageHeight/2 - yl;
+		    hoverPointX = Math.round(PageWidth/2 + 1.2f*xl);
+		    hoverPointY = Math.round(PageHeight/2 - 1.2f*yl);
 		    repaint();
 		}
 		
 		public void startPoint(int xl, int yl){
 		    System.out.print("start");
 		    
-            startPointX = PageWidth/2 + xl;
-            startPointY = PageHeight/2 -yl;
+            startPointX = Math.round(PageWidth/2 + 1.2f*xl);
+            startPointY = Math.round(PageHeight/2 -1.2f*yl);
             repaint();
         }
 		
@@ -1034,15 +1034,19 @@ public class GUI extends JFrame{
 		    
 		    hoverPointX = 0;
             hoverPointY = 0;
-            endPointX = PageWidth/2 + xl;
-            endPointY = PageHeight/2 - yl;
+            endPointX = Math.round(PageWidth/2 + 1.2f*xl);
+            endPointY = Math.round(PageHeight/2 - 1.2f*yl);
             
             repaint();
             
             float f = currentScale/100;
             extractSelectedScreenAsImage(Math.round(startPointX/f), Math.round(startPointY/f), Math.round(endPointX/f), Math.round(endPointY/f));
 		     
-            hoverPointX = 0;
+           abort();
+		}
+		
+		public void abort(){
+		    hoverPointX = 0;
             hoverPointY = 0;
             startPointX = 0;
             startPointY = 0;
@@ -1129,6 +1133,7 @@ public class GUI extends JFrame{
                     endPoint((int)Float.parseFloat(coordinate[1]),(int)Float.parseFloat(coordinate[2]));
                 }
                 else if (coordinate[0].equals("abort")){
+                    abort();
                     
                 }        
 			}
