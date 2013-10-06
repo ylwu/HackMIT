@@ -5,9 +5,11 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 
 import javax.swing.*;
@@ -567,6 +569,8 @@ public class GUI extends JFrame{
 			list[13] = scaling2;
 			
 			JButton scrollUp = new JButton();
+			URL scrollUpImage = getClass().getResource("/pictures/uparrow.jpeg");
+			scrollUp.setIcon(new ImageIcon(scrollUpImage));
 			scrollUp.setToolTipText("scroll up");
 			scrollUp.addActionListener(new ActionListener() {
 				@Override
@@ -582,6 +586,8 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollDown = new JButton();
+			URL scrollDownImage = getClass().getResource("/pictures/downarrow.jpeg");
+			scrollDown.setIcon(new ImageIcon(scrollDownImage));
 			scrollDown.setToolTipText("scroll down");
 			scrollDown.addActionListener(new ActionListener() {
 				@Override
@@ -598,6 +604,8 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollLeft = new JButton();
+			URL scrollLeftImage = getClass().getResource("/pictures/leftarrow.jpeg");
+			scrollLeft.setIcon(new ImageIcon(scrollLeftImage));
 			scrollLeft.setToolTipText("scroll left");
 			scrollLeft.addActionListener(new ActionListener() {
 				@Override
@@ -613,6 +621,8 @@ public class GUI extends JFrame{
 			});
 			
 			JButton scrollRight = new JButton();
+			URL scrollRightImage = getClass().getResource("/pictures/rightarrow.jpeg");
+			scrollRight.setIcon(new ImageIcon(scrollRightImage));
 			scrollRight.setToolTipText("scroll right");
 			scrollRight.addActionListener(new ActionListener() {
 				@Override
@@ -857,38 +867,41 @@ public class GUI extends JFrame{
 					forwardPage();
 				}
 				// back 1 page
-				if (coordinate[0].equals("swipe")
+				else if (coordinate[0].equals("swipe")
 						&& Float.parseFloat(coordinate[1]) > -100) {
 					backPage();
 				}
 				// back to first page
-				if (coordinate[0].equals("jump")
+				else if (coordinate[0].equals("jump")
 						&& Float.parseFloat(coordinate[0]) < -100) {
 					getFirstPage();
 				}
 				// fast backward 10 pages
-				if (coordinate[0].equals("fast")
+				else if (coordinate[0].equals("fast")
 						&& Float.parseFloat(coordinate[0]) < -100) {
 					fastbackward();
 
 				}
 				// fast forward 10 pages
-				if (coordinate[0].equals("fast")
+				else if (coordinate[0].equals("fast")
 						&& Float.parseFloat(coordinate[0]) > 100) {
 					fastforward();
 				}
 				// fast forward to last page
-				if (coordinate[0].equals("jump")
+				else if (coordinate[0].equals("jump")
 						&& Float.parseFloat(coordinate[0]) > 100) {
 					getLastPage();
 				}
-				if (coordinate[0].equals("zoomIn")){
+				
+				else if (coordinate[0].equals("zoomIn") && enable ==true){
 				    zoomIn(Float.parseFloat(coordinate[1]));
 				}
-				if (coordinate[0].equals("zoomOut")){
+				
+				else if (coordinate[0].equals("zoomOut") && enable ==true){
 	                zoomOut(Float.parseFloat(coordinate[1]));
 	            }
-				if (coordinate[0].equals("scroll")){
+				
+				else if (coordinate[0].equals("scroll") && enable ==true){
 					float speedX = Float.parseFloat(coordinate[1]);
 					float speedY = Float.parseFloat(coordinate[2]);
 					if(speedX>0){scrollRight(speedX);}
@@ -896,13 +909,27 @@ public class GUI extends JFrame{
 					if(speedY>0){scrollUp(speedY);}
 					else{scrollDown(Math.abs(speedY));}	
 				}
-				if (coordinate[0].equals("enable")){
+				else if (coordinate[0].equals("enable")){
 					enable_mode();
 				}
-				if (coordinate[0].equals("disable")){
+				else if (coordinate[0].equals("disable")){
 					disable_mode();
 				}
-				        
+				else if (coordinate[0].equals("hover")){
+				    
+				}
+				else if (coordinate[0].equals("start")){
+				    
+				}
+                else if (coordinate[0].equals("drag")){
+                    
+                }
+                else if (coordinate[0].equals("finish")){
+                    
+                }
+                else if (coordinate[0].equals("abort")){
+                    
+                }        
 			}
 
 		}
