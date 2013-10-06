@@ -233,11 +233,15 @@ public class JPanelDemo extends JFrame {
 
 		cPane = getContentPane();
 		cPane.setLayout(new BorderLayout());
-
+		
+		LeapInput leap = new LeapInput();
+        leap.start();
+        leap.addEventListener(new LeapMotion());
+		
 		JButton open = initOpenBut();// setup open button
 		Component[] itemsToAdd = initChangerPanel();// setup page display and
 													// changer
-
+		
 		JPanel topBar = new JPanel();
 		topBar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		topBar.add(open);
@@ -661,7 +665,7 @@ public class JPanelDemo extends JFrame {
 	public void zoomIn(float zoomF){
 	    pdfDecoder.setDisplayView(1,1);
             currentScale = Integer.parseInt(scaling.getText().trim());
-            int newScale = (int)(currentScale * zoomF);
+            int newScale = (int)(currentScale + zoomF/2);
             float factor = (float) ((double)newScale/100);
             pdfDecoder.setPageParameters(factor, currentPage);
             pdfDecoder.invalidate();
@@ -674,7 +678,7 @@ public class JPanelDemo extends JFrame {
 	public void zoomOut(float zoomF){
 	        pdfDecoder.setDisplayView(1,1);
 	            currentScale = Integer.parseInt(scaling.getText().trim());
-	            int newScale = (int)(currentScale / zoomF);
+	            int newScale = (int)(currentScale - zoomF/2);
 	            float factor = (float) ((double)newScale/100);
 	            pdfDecoder.setPageParameters(factor, currentPage);
 	            pdfDecoder.invalidate();
@@ -802,43 +806,47 @@ public class JPanelDemo extends JFrame {
 
 	}
 	
-	public void scrollUp(){
+	public void scrollUp(float speed){
 		pdfDecoder.setDisplayView(1, 1);
+		int move = (int) Math.exp((double)speed/10)*5;
 		int position = display.getVerticalScrollBar().getValue();
-		if(position>100){
-			display.getVerticalScrollBar().setValue(position-100);
+		if(position>move){
+			display.getVerticalScrollBar().setValue(position-move);
 		}else{
 			display.getVerticalScrollBar().setValue(0);
 		}
 	}
 	
-	public void scrollDown(){
+	public void scrollDown(float speed){
 		pdfDecoder.setDisplayView(1, 1);
+		int move = (int) Math.exp((double)speed/10)*5;
 		int position = display.getVerticalScrollBar().getValue();
 		int possPosi = display.getVerticalScrollBar().getMaximum()-display.getVerticalScrollBar().getHeight();
-		if(possPosi-100>position){
-			display.getVerticalScrollBar().setValue(position+100);
+		if(possPosi-move>position){
+			display.getVerticalScrollBar().setValue(position+move);
 		}else{
 			display.getVerticalScrollBar().setValue(possPosi);
 		}
 	}
 	
-	public void scrollLeft(){
+	public void scrollLeft(float speed){
 		pdfDecoder.setDisplayView(1, 1);
+		int move = (int) Math.exp((double)speed/10)*5;
 		int position = display.getHorizontalScrollBar().getValue();
-		if(position>100){
-			display.getHorizontalScrollBar().setValue(position-100);
+		if(position>move){
+			display.getHorizontalScrollBar().setValue(position-move);
 		}else{
 			display.getHorizontalScrollBar().setValue(0);
 		}
 	}
 	
-	public void scrollRight(){
+	public void scrollRight(float speed){
 		pdfDecoder.setDisplayView(1, 1);
+		int move = (int) Math.exp((double)speed/10)*5;
 		int position = display.getHorizontalScrollBar().getValue();
 		int possPosi = display.getHorizontalScrollBar().getMaximum()-display.getHorizontalScrollBar().getHeight();
-		if(possPosi-100>position){
-			display.getHorizontalScrollBar().setValue(position+100);
+		if(possPosi-move>position){
+			display.getHorizontalScrollBar().setValue(position+move);
 		}else{
 			display.getHorizontalScrollBar().setValue(possPosi);
 		}
@@ -900,7 +908,12 @@ public class JPanelDemo extends JFrame {
             }
 			
 			if (coordinate[0].equals("scroll")){
-				
+				float speedX = Float.parseFloat(coordinate[1]);
+				float speedY = Float.parseFloat(coordinate[2]);
+				if(speedX>0){scrollRight(speedX);}
+				else{scrollLeft(Math.abs(speedX));}
+				if(speedY>0){scrollUp(speedY);}
+				else{scrollDown(Math.abs(speedY));}	
 			}
 			        
 		}
@@ -909,13 +922,12 @@ public class JPanelDemo extends JFrame {
 
 	/** create a standalone program. User may pass in name of file as option */
 	public static void main(String[] args) {
-		JPanelDemo JP;
 		/** Run the software */
 		if (args.length > 0) {
-			JP = new JPanelDemo(args[0]);
+			new JPanelDemo(args[0]);
 		} else {
-			JP = new JPanelDemo();
+			new JPanelDemo();
 		}
-		
+
 	}
 }
