@@ -108,7 +108,7 @@ public class GUI extends JFrame{
 	
 	public class JPanelDemo extends JFrame {
 
-		private String viewerTitle = "Jpanel Demo";
+		private String viewerTitle = "Leada-the Leap Motion powered PDF reader";
 
 		/** the actual JPanel/decoder object */
 		public PdfDecoder pdfDecoder;
@@ -144,6 +144,8 @@ public class GUI extends JFrame{
 	    private int startPointY = 0;
 	    private int endPointX = 0;
 	    private int endPointY = 0;
+	    
+	    private boolean fileIn = false;
 	    
 	    public class Page extends PdfDecoder{
 	        
@@ -263,6 +265,8 @@ public class GUI extends JFrame{
 					repaint();
 					display.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 					display.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					
+					fileIn = true;
 				}
 			}
 		}
@@ -770,11 +774,11 @@ public class GUI extends JFrame{
 		  int y2 = pdfDecoder.getPDFHeight() -b2;
 		  int x1 = a1;
 		  int x2 = a2;
-		    System.out.println("extract");
-		    System.out.println(x1);
-		    System.out.println(x2);
-		    System.out.println(y1);
-		    System.out.println(y2);
+		    //System.out.println("extract");
+		    //System.out.println(x1);
+		    //System.out.println(x2);
+		    //System.out.println(y1);
+		    //System.out.println(y2);
 		    
 		    int i = x1;
 		    int j = x2;
@@ -1023,7 +1027,7 @@ public class GUI extends JFrame{
 		}
 		
 		public void startPoint(int xl, int yl){
-		    System.out.print("start");
+		    //System.out.print("start");
 		    
             startPointX = Math.round(PageWidth/2 + 1.2f*xl);
             startPointY = Math.round(PageHeight/2 -1.2f*yl);
@@ -1031,7 +1035,7 @@ public class GUI extends JFrame{
         }
 		
 		public void endPoint(int xl, int yl){
-		    System.out.println("end");
+		    //System.out.println("end");
 		    
 		    hoverPointX = 0;
             hoverPointY = 0;
@@ -1062,9 +1066,10 @@ public class GUI extends JFrame{
 		    }
 
 		    public void handleLeapEvent(LeapEvent e) {
+		        if (!fileIn) return;
 		        //System.out.println("getEvent"); 
 				String command = e.message;
-				System.out.println(command);
+				//System.out.println(command);
 				String[] coordinate = command.split(",");
 				// forward 1 page
 				if (coordinate[0] .equals("swipe")

@@ -196,6 +196,9 @@ public class LeapInput {
                 if (hasCircle){
                     allowHover = !allowHover;
                     resetSelect();
+                    if (!allowHover){
+                        fireEvent("abort");
+                    }
                 }
             }
         }
@@ -256,7 +259,6 @@ public class LeapInput {
     public void checkHand(){
         if (isDrawing) return;
         if (lastHands.size()<=3) return;
-        //System.out.println("checking hand");
         Vector thisHand = lastHands.getLast();
         Vector lastHand = lastHands.get(lastHands.size()-2);
         Vector lastHand2 = lastHands.get(lastHands.size()-3);
@@ -264,7 +266,6 @@ public class LeapInput {
                 lastHand.minus(lastHand2).getZ()<(-0.5*OPERATION_THRESHOLD)){
             if (!inOperation) {
                 fireEvent("enable");
-                System.out.println("Operation true");
                 inOperation = true;
                 zoomInCooldown = maxZoomCooldown;
                 zoomOutCooldown = maxZoomCooldown;
