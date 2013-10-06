@@ -34,8 +34,9 @@ public class LeapInput {
     long maxZoomCooldown = 1200;
     long zoomInCooldown;
     long zoomOutCooldown;
-    long maxScrollCooldown = 1200;
-    long scrollCooldown;
+    long maxScrollCooldown = 800;
+    long scrollUpCooldown;
+    long scrollDownCooldown;
     // Frequency of queue cleaning
     int decreaseFreq = 2;
     int decreaseQueue = 1;
@@ -91,7 +92,8 @@ public class LeapInput {
         swipeCooldown = 0;
         zoomInCooldown = 0;
         zoomOutCooldown = 0;
-        scrollCooldown = 0;
+        scrollUpCooldown = 0;
+        scrollDownCooldown = 0;
         tempCount = 0;
         resetSelect();
     }
@@ -274,7 +276,8 @@ public class LeapInput {
                 inOperation = true;
                 zoomInCooldown = maxZoomCooldown;
                 zoomOutCooldown = maxZoomCooldown;
-                scrollCooldown = maxScrollCooldown;
+                scrollUpCooldown = maxScrollCooldown;
+                scrollDownCooldown = maxScrollCooldown;
                 swipeCooldown = maxSwipeCooldown;
             }
         }else if (thisHand.minus(lastHand).getZ()>(OPERATION_THRESHOLD) &&
@@ -284,7 +287,8 @@ public class LeapInput {
                 inOperation = false;
                 zoomInCooldown = maxZoomCooldown;
                 zoomOutCooldown = maxZoomCooldown;
-                scrollCooldown = maxScrollCooldown;
+                scrollUpCooldown = maxScrollCooldown;
+                scrollDownCooldown = maxScrollCooldown;
                 swipeCooldown = maxSwipeCooldown;
             }
         }
@@ -332,8 +336,14 @@ public class LeapInput {
         Vector thisMove = thisMid.minus(lastMid);
         Vector lastMove = lastMid.minus(lastMid2);
         Vector weightedMove = thisMove.plus(lastMove.times(0.3f)).divide(1.3f);
-        if (weightedMove.getX()*weightedMove.getX()+weightedMove.getY()*weightedMove.getY()>400 && scrollCooldown<=0){
-            fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+        if (weightedMove.getX()*weightedMove.getX()+weightedMove.getY()*weightedMove.getY()>SCROLL_THRESHOLD*SCROLL_THRESHOLD){
+            if (weightedMove.getY()>0 && scrollUpCooldown<=0){
+                fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+                scrollDownCooldown = maxScrollCooldown;
+            }else if (weightedMove.getY()<0 && scrollDownCooldown<=0){
+                fireEvent("scroll,"+Float.toString(weightedMove.getX())+","+Float.toString(weightedMove.getY()));
+                scrollUpCooldown = maxScrollCooldown;
+            }
         }
     }
     
@@ -374,8 +384,11 @@ public class LeapInput {
         if (zoomOutCooldown>0){
             zoomOutCooldown-=interval;
         }
-        if (scrollCooldown>0){
-            scrollCooldown-=interval;
+        if (scrollUpCooldown>0){
+            scrollUpCooldown-=interval;
+        }
+        if (scrollDownCooldown>0){
+            scrollDownCooldown-=interval;
         }
         if (decreaseQueue%decreaseFreq==0){
             if (lastFingerA.size()>0){
