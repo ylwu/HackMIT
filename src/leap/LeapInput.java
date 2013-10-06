@@ -26,7 +26,7 @@ public class LeapInput {
     Frame frame;
     Frame lastFrame;
     LeapListener listener;
-    long interval = 200;
+    long interval = 150;
     // Cooldown set to keep pages from flipping back due to hand repositioning
     long maxSwipeCooldown = 1000;
     long swipeCooldown;
@@ -53,6 +53,7 @@ public class LeapInput {
     LinkedList<Vector> lastFingerB;
     LinkedList<Float> fingerDis;
     
+    boolean allowHover = false;
     boolean isDrawing = false;
     //Starting point of the extract zone
     Vector areaStart;
@@ -60,18 +61,9 @@ public class LeapInput {
     int selectCounter;
     int SELECT_HOLD_RANGE = 8;
     int MAX_SELECT_COUNTER = 12;
-    float xMin = -250;
-    float curXMin;
-    float xMax = 250;
-    float curXMax;
-    float yMin = -350;
-    float curYMin;
-    float yMax = 350;
-    float curYMax;
     int sidesCompleted;
     int faultTillNow;
     
-    int tempCount;
     
 
     public LeapInput(){
@@ -96,7 +88,6 @@ public class LeapInput {
         zoomOutCooldown = 0;
         scrollUpCooldown = 0;
         scrollDownCooldown = 0;
-        tempCount = 0;
         resetSelect();
         ultCooldown = 0;
     }
@@ -142,7 +133,7 @@ public class LeapInput {
                 checkZoomer();
             }
             // For specifying an area to extract
-            else if (fingers.count()==1){
+            else if (fingers.count()==1 && allowHover){
                 Vector thisTip = fingers.get(0).tipPosition();
                 if (isDrawing){
                     updateDrawing(thisTip);
@@ -175,7 +166,8 @@ public class LeapInput {
     }
     
     public void processGestures(){
-        //if (isDrawing) return;
+        if (isDrawing) return;
+        boolean hasCircle = false;
         GestureList gestures = lastFrame.isValid()?
                 frame.gestures(lastFrame) :
                 frame.gestures();
@@ -194,6 +186,17 @@ public class LeapInput {
                 }
                 processSwipe(gesList);
                 swipeCooldown = maxSwipeCooldown;
+            }else if (frame.hands().get(0).fingers().count()==1 &&
+                    numGestures>0){
+                for (int i=0;i<numGestures;i++){
+                    if (gestures.get(i).type()==Gesture.Type.TYPE_CIRCLE){
+                        hasCircle = true;
+                    }
+                }
+                if (hasCircle){
+                    allowHover = !allowHover;
+                    resetSelect();
+                }
             }
         }
         
@@ -246,10 +249,6 @@ public class LeapInput {
     private void resetSelect(){
         isDrawing = false;
         selectCounter = 0;
-        curXMin = xMax;
-        curXMax = xMin;
-        curYMin = yMax;
-        curYMax = yMin;
         sidesCompleted = 0;
         faultTillNow = 0;
     }

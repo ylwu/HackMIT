@@ -791,7 +791,8 @@ public class GUI extends JFrame{
 	        System.out.println("file saved");
 	    } catch (IOException e) {
 	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+	        //e.printStackTrace();
+            System.out.println("library failed");
 	    }  
 	    }
 		
@@ -1007,7 +1008,7 @@ public class GUI extends JFrame{
 		}
 		
 		public void hoverPoint(int xl, int yl){
-		    System.out.println("hover");
+		    //System.out.println("hover");
 		    hoverPointX = Math.round(PageWidth/2 + 1.2f*xl);
 		    hoverPointY = Math.round(PageHeight/2 - 1.2f*yl);
 		    repaint();
@@ -1053,7 +1054,7 @@ public class GUI extends JFrame{
 		    }
 
 		    public void handleLeapEvent(LeapEvent e) {
-		        System.out.println("getEvent"); 
+		        //System.out.println("getEvent"); 
 				String command = e.message;
 				System.out.println(command);
 				String[] coordinate = command.split(",");

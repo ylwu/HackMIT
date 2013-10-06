@@ -7,7 +7,7 @@ class LeapListener extends Listener {
     public void onInit(Controller controller) {
         System.out.println("Initialized");
         controller.enableGesture(Gesture.Type.TYPE_SWIPE);
-        //controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
+        controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
         //controller.enableGesture(Gesture.Type.TYPE_SCREEN_TAP);
         //controller.enableGesture(Gesture.Type.TYPE_KEY_TAP);
     }
