@@ -858,42 +858,42 @@ public class GUI extends JFrame{
 					forwardPage();
 				}
 				// back 1 page
-				if (coordinate[0].equals("swipe")
+				else if (coordinate[0].equals("swipe")
 						&& Float.parseFloat(coordinate[1]) > -100) {
 					backPage();
 				}
 				// back to first page
-				if (coordinate[0].equals("jump")
+				else if (coordinate[0].equals("jump")
 						&& Float.parseFloat(coordinate[0]) < -100) {
 					getFirstPage();
 				}
 				// fast backward 10 pages
-				if (coordinate[0].equals("fast")
+				else if (coordinate[0].equals("fast")
 						&& Float.parseFloat(coordinate[0]) < -100) {
 					fastbackward();
 
 				}
 				// fast forward 10 pages
-				if (coordinate[0].equals("fast")
+				else if (coordinate[0].equals("fast")
 						&& Float.parseFloat(coordinate[0]) > 100) {
 					fastforward();
 
 				}
 				// fast forward to last page
-				if (coordinate[0].equals("jump")
+				else if (coordinate[0].equals("jump")
 						&& Float.parseFloat(coordinate[0]) > 100) {
 					getLastPage();
 				}
 				
-				if (coordinate[0].equals("zoomIn") && enable ==true){
+				else if (coordinate[0].equals("zoomIn") && enable ==true){
 				    zoomIn(Float.parseFloat(coordinate[1]));
 				}
 				
-				if (coordinate[0].equals("zoomOut") && enable ==true){
+				else if (coordinate[0].equals("zoomOut") && enable ==true){
 	                zoomOut(Float.parseFloat(coordinate[1]));
 	            }
 				
-				if (coordinate[0].equals("scroll") && enable ==true){
+				else if (coordinate[0].equals("scroll") && enable ==true){
 					float speedX = Float.parseFloat(coordinate[1]);
 					float speedY = Float.parseFloat(coordinate[2]);
 					if(speedX>0){scrollRight(speedX);}
@@ -901,13 +901,27 @@ public class GUI extends JFrame{
 					if(speedY>0){scrollUp(speedY);}
 					else{scrollDown(Math.abs(speedY));}	
 				}
-				if (coordinate[0].equals("enable")){
+				else if (coordinate[0].equals("enable")){
 					enable_mode();
 				}
-				if (coordinate[0].equals("disable")){
+				else if (coordinate[0].equals("disable")){
 					disable_mode();
 				}
-				        
+				else if (coordinate[0].equals("hover")){
+				    
+				}
+				else if (coordinate[0].equals("start")){
+				    
+				}
+                else if (coordinate[0].equals("drag")){
+                    
+                }
+                else if (coordinate[0].equals("finish")){
+                    
+                }
+                else if (coordinate[0].equals("abort")){
+                    
+                }        
 			}
 
 		}
