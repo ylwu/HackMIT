@@ -26,15 +26,23 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EventObject;
 
+import javax.imageio.ImageIO;
+import javax.media.jai.JAI;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -50,10 +58,12 @@ import leap.LeapInput;
 
 import org.jpedal.PdfDecoder;
 import org.jpedal.examples.viewer.utils.FileFilterer;
+import org.jpedal.examples.viewer.utils.IconiseImage;
 import org.jpedal.exception.PdfException;
 import org.jpedal.fonts.FontMappings;
 import org.jpedal.objects.PdfImageData;
 import org.jpedal.objects.PdfPageData;
+
 
 /**
  * very simple example of a viewer
@@ -88,7 +98,7 @@ public class JPanelDemo extends JFrame {
 	private final JLabel pageCounter3 = new JLabel("of");// 000 used to set
 															// prefered // size
 	private JTextField scaling = new JTextField(4);
-	private final JLabel scaling2 = new JLabel("%");
+	private final JLabel scaling2 = new JLabel("%"); 
 
 	/**
 	 * construct a pdf viewer, passing in the full file name
@@ -101,6 +111,9 @@ public class JPanelDemo extends JFrame {
 		// setup our GUI display
 		initializeViewer();
 		// set page number display
+		LeapInput leap = new LeapInput();
+        leap.start();
+        leap.addEventListener(new LeapMotion());
 	}
 
 	/**
@@ -112,6 +125,9 @@ public class JPanelDemo extends JFrame {
 		// ensure non-embedded font map to sensible replacements
 		FontMappings.setFontReplacements();
 		initializeViewer();
+		LeapInput leap = new LeapInput();
+        leap.start();
+        leap.addEventListener(new LeapMotion());
 	}
 
 	/**
@@ -217,11 +233,15 @@ public class JPanelDemo extends JFrame {
 
 		cPane = getContentPane();
 		cPane.setLayout(new BorderLayout());
-
+		
+		LeapInput leap = new LeapInput();
+        leap.start();
+        leap.addEventListener(new LeapMotion());
+		
 		JButton open = initOpenBut();// setup open button
 		Component[] itemsToAdd = initChangerPanel();// setup page display and
 													// changer
-
+		
 		JPanel topBar = new JPanel();
 		topBar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		topBar.add(open);
@@ -237,7 +257,7 @@ public class JPanelDemo extends JFrame {
 		cPane.add(display, BorderLayout.CENTER);
 		pack();
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		setSize(screen.width/2, screen.height/2);
+		setSize(screen.width*2/3, screen.height*2/3);
 		setLocationRelativeTo(null);// centre on screen
 		setVisible(true);
 	}
@@ -280,7 +300,7 @@ public class JPanelDemo extends JFrame {
 	 */
 	private Component[] initChangerPanel() {
 
-		Component[] list = new Component[14];
+		Component[] list = new Component[19];
 
 		/** back to page 1 */
 		JButton start = new JButton();
@@ -555,14 +575,97 @@ public class JPanelDemo extends JFrame {
 		});
 
 		list[13] = scaling2;
-
+		
+		JButton scrollUp = new JButton();
+		scrollUp.setToolTipText("scroll up");
+		scrollUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pdfDecoder.setDisplayView(1, 1);
+				int position = display.getVerticalScrollBar().getValue();
+				if(position>100){
+					display.getVerticalScrollBar().setValue(position-100);
+				}else{
+					display.getVerticalScrollBar().setValue(0);
+				}
+			}
+		});
+		
+		JButton scrollDown = new JButton();
+		scrollDown.setToolTipText("scroll down");
+		scrollDown.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pdfDecoder.setDisplayView(1, 1);
+				int position = display.getVerticalScrollBar().getValue();
+				int possPosi = display.getVerticalScrollBar().getMaximum()-display.getVerticalScrollBar().getHeight();
+				if(possPosi-100>position){
+					display.getVerticalScrollBar().setValue(position+100);
+				}else{
+					display.getVerticalScrollBar().setValue(possPosi);
+				}
+			}
+		});
+		
+		JButton scrollLeft = new JButton();
+		scrollLeft.setToolTipText("scroll left");
+		scrollLeft.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pdfDecoder.setDisplayView(1, 1);
+				int position = display.getHorizontalScrollBar().getValue();
+				if(position>100){
+					display.getHorizontalScrollBar().setValue(position-100);
+				}else{
+					display.getHorizontalScrollBar().setValue(0);
+				}
+			}
+		});
+		
+		JButton scrollRight = new JButton();
+		scrollRight.setToolTipText("scroll right");
+		scrollRight.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pdfDecoder.setDisplayView(1, 1);
+				int position = display.getHorizontalScrollBar().getValue();
+				int possPosi = display.getHorizontalScrollBar().getMaximum()-display.getHorizontalScrollBar().getHeight();
+				if(possPosi-100>position){
+					display.getHorizontalScrollBar().setValue(position+100);
+				}else{
+					display.getHorizontalScrollBar().setValue(possPosi);
+				}
+			}
+		});
+		
+		list[14] = new JPanel();
+		list[15] = scrollUp;
+		list[16] = scrollDown;
+		list[17] = scrollLeft;
+		list[18] = scrollRight;
+		
 		return list;
+	}
+	
+	
+	public void extractSelectedScreenAsImage(int i,int k, int j, int m)
+	  {
+   
+    float f = 100.0F;
+    final BufferedImage localBufferedImage = pdfDecoder.getSelectedRectangleOnscreen(i, k, j, m, f);
+    File outputfile = new File("image.jpg");
+    try {
+        ImageIO.write(localBufferedImage, "jpg", outputfile);
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }  
 	}
 	
 	public void zoomIn(float zoomF){
 	    pdfDecoder.setDisplayView(1,1);
             currentScale = Integer.parseInt(scaling.getText().trim());
-            int newScale = (int)(currentScale * zoomF);
+            int newScale = (int)(currentScale + zoomF/2);
             float factor = (float) ((double)newScale/100);
             pdfDecoder.setPageParameters(factor, currentPage);
             pdfDecoder.invalidate();
@@ -575,7 +678,7 @@ public class JPanelDemo extends JFrame {
 	public void zoomOut(float zoomF){
 	        pdfDecoder.setDisplayView(1,1);
 	            currentScale = Integer.parseInt(scaling.getText().trim());
-	            int newScale = (int)(currentScale / zoomF);
+	            int newScale = (int)(currentScale - zoomF/2);
 	            float factor = (float) ((double)newScale/100);
 	            pdfDecoder.setPageParameters(factor, currentPage);
 	            pdfDecoder.invalidate();
@@ -702,6 +805,52 @@ public class JPanelDemo extends JFrame {
 		}
 
 	}
+	
+	public void scrollUp(float speed){
+		pdfDecoder.setDisplayView(1, 1);
+		int move = (int) Math.exp((double)speed/10)*5;
+		int position = display.getVerticalScrollBar().getValue();
+		if(position>move){
+			display.getVerticalScrollBar().setValue(position-move);
+		}else{
+			display.getVerticalScrollBar().setValue(0);
+		}
+	}
+	
+	public void scrollDown(float speed){
+		pdfDecoder.setDisplayView(1, 1);
+		int move = (int) Math.exp((double)speed/10)*5;
+		int position = display.getVerticalScrollBar().getValue();
+		int possPosi = display.getVerticalScrollBar().getMaximum()-display.getVerticalScrollBar().getHeight();
+		if(possPosi-move>position){
+			display.getVerticalScrollBar().setValue(position+move);
+		}else{
+			display.getVerticalScrollBar().setValue(possPosi);
+		}
+	}
+	
+	public void scrollLeft(float speed){
+		pdfDecoder.setDisplayView(1, 1);
+		int move = (int) Math.exp((double)speed/10)*5;
+		int position = display.getHorizontalScrollBar().getValue();
+		if(position>move){
+			display.getHorizontalScrollBar().setValue(position-move);
+		}else{
+			display.getHorizontalScrollBar().setValue(0);
+		}
+	}
+	
+	public void scrollRight(float speed){
+		pdfDecoder.setDisplayView(1, 1);
+		int move = (int) Math.exp((double)speed/10)*5;
+		int position = display.getHorizontalScrollBar().getValue();
+		int possPosi = display.getHorizontalScrollBar().getMaximum()-display.getHorizontalScrollBar().getHeight();
+		if(possPosi-move>position){
+			display.getHorizontalScrollBar().setValue(position+move);
+		}else{
+			display.getHorizontalScrollBar().setValue(possPosi);
+		}
+	}
 
 	public class LeapMotion implements LeapEventListener {
 	    
@@ -757,6 +906,15 @@ public class JPanelDemo extends JFrame {
 			if (coordinate[0].equals("zoomOut")){
                 zoomOut(Float.parseFloat(coordinate[1]));
             }
+			
+			if (coordinate[0].equals("scroll")){
+				float speedX = Float.parseFloat(coordinate[1]);
+				float speedY = Float.parseFloat(coordinate[2]);
+				if(speedX>0){scrollRight(speedX);}
+				else{scrollLeft(Math.abs(speedX));}
+				if(speedY>0){scrollUp(speedY);}
+				else{scrollDown(Math.abs(speedY));}	
+			}
 			        
 		}
 
@@ -764,15 +922,12 @@ public class JPanelDemo extends JFrame {
 
 	/** create a standalone program. User may pass in name of file as option */
 	public static void main(String[] args) {
-		JPanelDemo JP;
 		/** Run the software */
 		if (args.length > 0) {
-			JP = new JPanelDemo(args[0]);
+			new JPanelDemo(args[0]);
 		} else {
-			JP = new JPanelDemo();
+			new JPanelDemo();
 		}
-		LeapInput leap = new LeapInput();
-        leap.start();
-        leap.addEventListener(JP.new LeapMotion());
+
 	}
 }
