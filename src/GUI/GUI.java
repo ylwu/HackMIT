@@ -1,6 +1,7 @@
 package GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -217,6 +218,7 @@ public class GUI extends JFrame{
 			setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 			cPane = getContentPane();
+			
 			cPane.setLayout(new BorderLayout());
 			
 			LeapInput leap = new LeapInput();
@@ -228,6 +230,7 @@ public class GUI extends JFrame{
 														// changer
 			
 			JPanel topBar = new JPanel();
+			topBar.setBackground(Color.yellow);
 			topBar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 			topBar.add(open);
 			topBar.add(mode);

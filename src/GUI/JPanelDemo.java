@@ -317,8 +317,8 @@ public class JPanelDemo extends JFrame {
 	private JButton initMode() {
 
 		JButton mode = new JButton();
-		mode.setIcon(new ImageIcon(getClass().getResource(
-				"/org/jpedal/examples/viewer/res/open.gif"))); //$NON-NLS-1$
+		//mode.setIcon(new ImageIcon(getClass().getResource(
+				//"/org/jpedal/examples/viewer/res/open.gif"))); //$NON-NLS-1$
 		mode.setText("Zoom Disabled");
 		mode.setToolTipText("Mode of the reader");
 		mode.setBorderPainted(false);
