@@ -26,7 +26,7 @@ public class LeapInput {
     Frame frame;
     Frame lastFrame;
     LeapListener listener;
-    long interval = 100;
+    long interval = 200;
     // Cooldown set to keep pages from flipping back due to hand repositioning
     long maxSwipeCooldown = 1000;
     long swipeCooldown;
@@ -37,6 +37,8 @@ public class LeapInput {
     long maxScrollCooldown = 1500;
     long scrollUpCooldown;
     long scrollDownCooldown;
+    long maxUltCooldown = 10000;
+    long ultCooldown;
     // Frequency of queue cleaning
     int decreaseFreq = 2;
     int decreaseQueue = 1;
@@ -96,10 +98,11 @@ public class LeapInput {
         scrollDownCooldown = 0;
         tempCount = 0;
         resetSelect();
+        ultCooldown = 0;
     }
     
     // Takes care of toggling zooming/scrolling on and off
-    public void processHand(){
+    public synchronized void processHand(){
         if (!frame.hands().empty()) {
             // Get the first hand
             Hand hand = frame.hands().get(0);
@@ -145,13 +148,13 @@ public class LeapInput {
                     updateDrawing(thisTip);
                     return;
                 }else{
-                    fireEvent("hover,"+Float.toString(thisTip.getX()*1.3f)+","+Float.toString(thisTip.getY()*1.3f));
+                    fireEvent("hover,"+Float.toString(thisTip.getX())+","+Float.toString(thisTip.getY()));
                 }
-                if (!inOperation){
+                if (inOperation){
                     if (selectCounter==MAX_SELECT_COUNTER){
                         isDrawing = true;
                         areaStart = thisTip;
-                        fireEvent("start,"+Float.toString(areaStart.getX()*1.3f)+","+Float.toString(areaStart.getY()*1.3f));
+                        fireEvent("start,"+Float.toString(areaStart.getX())+","+Float.toString(areaStart.getY()));
                         selectCounter = 0;
                     }
                     if (lastFinger!=null){
@@ -223,9 +226,10 @@ public class LeapInput {
     public void updateDrawing(Vector fingerTip){
         if (selectCounter==MAX_SELECT_COUNTER){
             if (fingerTip.distanceTo(areaStart)>SELECT_HOLD_RANGE*2){
-                fireEvent("finish,"+Float.toString(fingerTip.getX()*1.3f)+","+Float.toString(fingerTip.getY()*1.3f));
+                fireEvent("finish,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
+                ultCooldown = maxUltCooldown;
             }else {
-                fireEvent("abort,"+Float.toString(fingerTip.getX()*1.3f)+","+Float.toString(fingerTip.getY()*1.3f));
+                fireEvent("abort,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
             }
             resetSelect();
             return;
@@ -235,7 +239,7 @@ public class LeapInput {
         }else{
             selectCounter = 0;
         }
-        fireEvent("drag,"+Float.toString(fingerTip.getX()*1.3f)+","+Float.toString(fingerTip.getY()*1.3f));
+        fireEvent("drag,"+Float.toString(fingerTip.getX())+","+Float.toString(fingerTip.getY()));
         lastFinger = fingerTip;
     }
     
@@ -338,23 +342,6 @@ public class LeapInput {
         }
     }
     
-    public void onScreenTap(ScreenTapGesture tap){
-        System.out.println("Screen tap");
-        
-    }
-    
-    public void onKeyTap(KeyTapGesture tap){
-        System.out.println("Key tap");
-    }
-    
-    public void onSwipe(SwipeGesture tap){
-        System.out.println("Swipe");
-    }
-    
-    public void onCircle(CircleGesture tap){
-        System.out.println("Circle");
-    }
-    
     public void update(){
         frame = controller.frame();
         //System.out.println(frame.toString());
@@ -380,6 +367,9 @@ public class LeapInput {
         }
         if (scrollDownCooldown>0){
             scrollDownCooldown-=interval;
+        }
+        if (ultCooldown>0){
+            ultCooldown-=interval;
         }
         if (decreaseQueue%decreaseFreq==0){
             if (lastFingerA.size()>0){
