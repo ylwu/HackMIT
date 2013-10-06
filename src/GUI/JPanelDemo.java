@@ -103,7 +103,9 @@ public class JPanelDemo extends JFrame {
 															// prefered // size
 	private JTextField scaling = new JTextField(4);
 	private final JLabel scaling2 = new JLabel("%");
-	private static final Stroke LINE_STROKE = new BasicStroke(3f);
+	private static final Stroke LINE_STROKE = new BasicStroke(10);
+	private static final int PageHeight = 538;
+	private static final int PageWidth = 956;
 	
 	public class Page extends PdfDecoder{
 	    
@@ -118,7 +120,7 @@ public class JPanelDemo extends JFrame {
 	       Graphics2D g2 = (Graphics2D) g;
 	       g2.setStroke(LINE_STROKE);
 	       g2.setColor(Color.red);
-	       g2.drawLine(0, 50, getWidth(), 50);
+	       g2.drawLine(PageWidth/2,PageHeight/2,PageWidth/2,PageHeight/2);
 	    }
 	}
 	private boolean enable;
@@ -130,6 +132,7 @@ public class JPanelDemo extends JFrame {
 	 */
 	public JPanelDemo(String name) {
 		pdfDecoder = new Page(true);
+		mode = initMode();
 		System.out.println(pdfDecoder.getSize().height);
 		System.out.println(pdfDecoder.getSize().width);
 		// ensure non-embedded font map to sensible replacements
@@ -148,6 +151,7 @@ public class JPanelDemo extends JFrame {
 	 */
 	public JPanelDemo() {
 		setTitle(viewerTitle);
+		mode = initMode();
 		pdfDecoder = new Page(true);
 		// ensure non-embedded font map to sensible replacements
 		FontMappings.setFontReplacements();
@@ -201,6 +205,8 @@ public class JPanelDemo extends JFrame {
 					// these 2 lines opens page 1 at 100% scaling
 					pdfDecoder.setPageParameters(1, 1); // values scaling // (1=100%). page number
 					pdfDecoder.invalidate();
+					System.out.println(pdfDecoder.getSize().height);
+			        System.out.println(pdfDecoder.getSize().width);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1006,12 +1012,12 @@ public class JPanelDemo extends JFrame {
 	}
 
 	/** create a standalone program. User may pass in name of file as option */
-/*	public static void main(String[] args) {
-		*//** Run the software *//*
+	public static void main(String[] args) {
+		//** Run the software *//
 		if (args.length > 0) {
 			new JPanelDemo(args[0]);
 		} else {
 			new JPanelDemo();
 		}
-	}*/
+	}
 }
