@@ -24,7 +24,10 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.TimerTask;
+import java.util.Timer;
 
+import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -53,6 +56,7 @@ public class GUI extends JFrame{
 	
 	private Container cPane = new Container();
 	private JButton start = new JButton("Start");
+	private Timer timer = new Timer();
 	
 	public GUI(String name){
 
@@ -75,20 +79,21 @@ public class GUI extends JFrame{
 		cPane = getContentPane();
 		cPane.setLayout(new BorderLayout());
 		
-		start.setToolTipText("scroll right");
-		start.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new JPanelDemo();
-			}
-		});
-		
 		cPane.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-		cPane.add(start);
+		
+				//"pictures/Logo.png"
 		
 		setSize(500, 500);
 		setLocationRelativeTo(null);// centre on screen
 		setVisible(true);
+		
+		class DateTask extends TimerTask {
+			   @ Override
+			   public void run() {
+		       new JPanelDemo();
+		   }
+		}
+		timer.schedule(new DateTask(), 1000);
 	}
 	
     
