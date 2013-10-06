@@ -78,16 +78,8 @@ public class LeapInput {
 
         // Have the sample listener receive events from the controller
         controller.addListener(listener);
-        if(controller.config().setFloat("Gesture.ScreenTap.MinForwardVelocity", 20.0f) &&
-                controller.config().setFloat("Gesture.ScreenTap.HistorySeconds", .2f) &&
-                controller.config().setFloat("Gesture.ScreenTap.MinDistance", 4.0f) &&
-                controller.config().setFloat("Gesture.KeyTap.MinDownVelocity", 30.0f) &&
-                controller.config().setFloat("Gesture.KeyTap.HistorySeconds", .3f) &&
-                controller.config().setFloat("Gesture.KeyTap.MinDistance", 4.0f) &&
-                controller.config().setFloat("Gesture.Swipe.MinLength", 100.0f) &&
-                controller.config().setFloat("Gesture.Swipe.MinVelocity", 500f) &&
-                controller.config().setFloat("Gesture.Circle.MinRadius", 10.0f) &&
-                controller.config().setFloat("Gesture.Circle.MinArc", 4.5f))
+        if(controller.config().setFloat("Gesture.Swipe.MinLength", 100.0f) &&
+                controller.config().setFloat("Gesture.Swipe.MinVelocity", 500f))
             controller.config().save();
         frame = controller.frame();
         lastFrame = frame;
@@ -122,18 +114,10 @@ public class LeapInput {
             
             // For page flipping, zooming and on-page scrolling
             if (fingers.count()==2 && inOperation && !isDrawing) {
-                // Calculate the hand's average finger tip position
-                //Vector avgPos = Vector.zero();
-                //for (Finger finger : fingers) {
-                //    avgPos = avgPos.plus(finger.tipPosition());
-                //}
                 Finger fingerA = fingers.get(0);
                 Finger fingerB = fingers.get(1);
                 Vector fingerAPos = fingerA.tipPosition();
                 Vector fingerBPos = fingerB.tipPosition();
-                //avgPos = avgPos.divide(fingers.count());
-//                System.out.println("Hand has " + fingers.count()
-//                                 + " fingers, palm position: " + handPos);
                 
                 
                 if (lastFingerA.size()>10){
@@ -213,24 +197,6 @@ public class LeapInput {
                 swipeCooldown = maxSwipeCooldown;
             }
         }
-//        for (int i=0; i<numGestures;i++){
-//            if (gestures.get(i).type()==Gesture.Type.TYPE_SCREEN_TAP){
-//                ScreenTapGesture tap = new ScreenTapGesture(gestures.get(i));
-//                onScreenTap(tap);
-//            }else if (gestures.get(i).type()==Gesture.Type.TYPE_KEY_TAP){
-//                KeyTapGesture tap = new KeyTapGesture(gestures.get(i));
-//                onKeyTap(tap);
-//            }else if (gestures.get(i).type()==Gesture.Type.TYPE_SWIPE){
-//                SwipeGesture tap = new SwipeGesture(gestures.get(i));
-//                if (tap.pointables().count()>3){
-//                    System.out.println("tap: "+Integer.toString(tap.pointables().count()));
-//                    onSwipe(tap);
-//                }
-//            }else if (gestures.get(i).type()==Gesture.Type.TYPE_CIRCLE){
-//                CircleGesture tap = new CircleGesture(gestures.get(i));
-//                onCircle(tap);
-//            }
-//        }
         
     }
     
