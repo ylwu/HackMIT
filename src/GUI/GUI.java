@@ -334,7 +334,7 @@ public class GUI extends JFrame{
 		private JButton initOpenBut() {
 			JButton open = new JButton();
 			open.setIcon(new ImageIcon(getClass().getResource(
-					"/org/jpedal/examples/viewer/res/open.gif"))); //$NON-NLS-1$
+					"pictures/open.jpeg"))); //$NON-NLS-1$
 			open.setText("Open");
 			open.setToolTipText("Open a file");
 			open.setBorderPainted(false);
@@ -363,8 +363,8 @@ public class GUI extends JFrame{
 		private JButton initMode() {
 
 			JButton mode = new JButton();
-			mode.setIcon(new ImageIcon(getClass().getResource(
-					"/org/jpedal/examples/viewer/res/open.gif"))); //$NON-NLS-1$
+			URL closelock = getClass().getResource("pictures/closedlock.jpeg");
+			mode.setIcon(new ImageIcon(closelock)); 
 			mode.setText("Zoom Disabled");
 			mode.setToolTipText("Mode of the reader");
 			mode.setBorderPainted(false);
@@ -988,10 +988,17 @@ public class GUI extends JFrame{
 		public void enable_mode(){
 			enable = true;
 			mode.setText("Zoom Enabled");
+			
+			URL openlock = getClass().getResource("pictures/openlock.jpeg");
+			mode.setIcon(new ImageIcon(openlock));
+			
 		}
 		public void disable_mode(){
 			enable = false;
 			mode.setText("Zoom Disabled");
+			
+			URL closelock = getClass().getResource("pictures/closedlock.jpeg");
+			mode.setIcon(new ImageIcon(closelock));
 		}
 		
 		public void hoverPoint(int xl, int yl){
@@ -1091,6 +1098,7 @@ public class GUI extends JFrame{
 				}
 				else if (coordinate[0].equals("enable")){
 					enable_mode();
+					
 				}
 				else if (coordinate[0].equals("disable")){
 					disable_mode();
