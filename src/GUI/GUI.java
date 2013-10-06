@@ -10,8 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
-import javax.swing.AbstractButton;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -22,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import leap.LeapEvent;
@@ -41,6 +40,22 @@ public class GUI extends JFrame{
 	private JButton start = new JButton("Start");
 	
 	public GUI(String name){
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (InstantiationException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (IllegalAccessException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (UnsupportedLookAndFeelException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		cPane = getContentPane();
 		cPane.setLayout(new BorderLayout());
@@ -121,15 +136,18 @@ public class GUI extends JFrame{
 
 		/**
 		 * opens a chooser and allows user to select a pdf file and opens it
+		 * @throws UnsupportedLookAndFeelException 
+		 * @throws IllegalAccessException 
+		 * @throws InstantiationException 
+		 * @throws ClassNotFoundException 
 		 */
-		private void selectFile() {
+		private void selectFile() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 			pageImages = null;
 			pageTexts = null;
 			JFileChooser open = new JFileChooser(".");
 			open.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			open.setFileView(new ImageFileView());
 			open.setAcceptAllFileFilterUsed(false);
-            ImageIcon upIcon = Utils.createImageIcon("pictures/updir.jpg");
 			String[] pdf = new String[] { "pdf" };
 			open.addChoosableFileFilter(new FileFilterer(pdf, "Pdf (*.pdf)"));
 			int resultOfFileSelect = JFileChooser.ERROR_OPTION;
@@ -263,7 +281,21 @@ public class GUI extends JFrame{
 			open.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					selectFile();
+					try {
+                        selectFile();
+                    } catch (ClassNotFoundException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    } catch (InstantiationException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    } catch (IllegalAccessException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    } catch (UnsupportedLookAndFeelException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
 				}
 			});
 			return open;

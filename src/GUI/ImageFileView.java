@@ -64,20 +64,17 @@ public class ImageFileView extends FileView {
     }
     
     public Icon getIcon(File f) {
-        
-        FileSystemView view=FileSystemView.getFileSystemView();
-        return view.getSystemIcon(f);
-//        String extension = Utils.getExtension(f);
-//        Icon icon = null;
-//        if (f.isDirectory()){
-//            icon = folderIcon;
-//        }
-//
-//        else if (extension != null) {
-//            if (extension.equals(Utils.pdf)) {
-//                icon = pdfIcon;
-//            } 
-//        }
-//        return icon;
+        String extension = Utils.getExtension(f);
+        Icon icon = null;
+        if (f.isDirectory()){
+            icon = folderIcon;
+        }
+
+        else if (extension != null) {
+            if (extension.equals(Utils.pdf)) {
+                icon = pdfIcon;
+            } 
+        }
+        return icon;
     }
 }
